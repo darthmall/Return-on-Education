@@ -60,25 +60,33 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-.male {
+body {
+    width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+svg {
+    display: block;
+}
+
+.post-secondary_male {
+    fill: white;
     stroke-width: 2px;
     stroke: #1E324A;
 }
 
-.female {
-    stroke-width: 4px;
+.post-secondary_female {
+    fill: white;
+    stroke-width: 2px;
     stroke: #E03A8C;
 }
 
-.post_secondary circle {
-    fill: white;
-}
-
-.tertiary .male {
+.tertiary_male {
     fill: #1E324A;
 }
 
-.tertiary .female {
+.tertiary_female {
     fill: #E03A8C;
 }
 
