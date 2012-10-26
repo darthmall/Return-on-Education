@@ -7,12 +7,13 @@ import sqlite3
 
 def readData(c, table):
     rows = c.execute('''SELECT country, gender, cost_ratio, benefit_ratio,
-        private_costs, private_benefits, public_costs, public_benefits
+        private_costs, private_benefits, private_npv, public_costs,
+        public_benefits, public_npv
         FROM {}'''.format(table))
 
     obj = [dict(itertools.izip(('country', 'gender', 'cost_ratio',
-        'benefit_ratio', 'private_costs', 'private_benefits', 'public_costs',
-        'public_benefits'),
+        'benefit_ratio', 'private_costs', 'private_benefits', 'private_npv',
+        'public_costs', 'public_benefits', 'public_npv'),
         row)) for row in rows]
 
     return obj
