@@ -90,9 +90,22 @@ svg {
     fill: #E03A8C;
 }
 
+.layer {
+    opacity: 0.5;
+}
 
+.axis text {
+    fill: #888;
+    font-size: 11px;
+}
 
+.axis line {
+    stroke: #888;
+}
 
+.axis path {
+  display: none;
+}
 
 /* ==========================================================================
    Media Queries
