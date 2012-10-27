@@ -70,43 +70,26 @@ svg {
     display: block;
 }
 
-.post-secondary_male {
-    fill: white;
-    stroke-width: 2px;
-    stroke: #1E324A;
+.npv {
+    fill: #0770A2;
 }
 
-.post-secondary_female {
-    fill: white;
-    stroke-width: 2px;
-    stroke: #E03A8C;
+.total_benefits {
+    fill: #82D9F7;
 }
 
-.tertiary_male {
-    fill: #1E324A;
+text{
+    font-size: 12px;
 }
 
-.tertiary_female {
-    fill: #E03A8C;
+.country {
+    text-anchor: end;
 }
 
-.layer {
-    opacity: 0.5;
+.total-benefits,
+.total-costs {
+    text-anchor: middle;
 }
-
-.axis text {
-    fill: #888;
-    font-size: 11px;
-}
-
-.axis line {
-    stroke: #888;
-}
-
-.axis path {
-  display: none;
-}
-
 /* ==========================================================================
    Media Queries
    ========================================================================== */

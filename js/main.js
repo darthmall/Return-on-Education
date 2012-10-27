@@ -1,76 +1,180 @@
 (function() {
 	// Set up the dimensions
-	var margin = { top: 20, right: 60, bottom: 60, left: 100 },
+	var margin = { top: 10, right: 10, bottom: 100, left: 100 },
+		padding = {top: 5, right: 5, bottom: 15, left: 5},
 		width = benefits.clientWidth - margin.left - margin.right,
 		height = benefits.clientHeight - margin.top - margin.bottom;
+
+	// Create a scale for the area of the triangle based on the width of the SVG
+	var colWidth = width/4 - padding.left - padding.right;
+	var area = d3.scale.linear().range([0, Math.pow(colWidth, 2) * Math.sqrt(3) / 4]);
 
 	// Groups for the different charts
 	var svg = d3.select('#benefits')
 		.append('g')
-		.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-		
+			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-	var data = [];
+	var nest = d3.nest()
+		.key(function (d) { return d.country; });
 
-	// Layout for the balloon svg
-	var x = d3.scale.linear().range([0, width]),
-		y = d3.scale.linear().range([height, 0]);
+	var properties = ['total costs', 'total benefits', 'net present value'];
 
-	var xAxis = d3.svg.axis().scale(x).orient('bottom'),
-		yAxis = d3.svg.axis().scale(y).orient('left');
+	d3.csv('data/incentives.csv', function (csv) {
 
-	d3.selectAll('select').on('change', invalidate);
+		// Filter out only the rows we want
+		var data = csv.filter(function (d) {
 
-	invalidate();
+			// Does this row match our filter criteria?
+			var include = (d.sector === sector.value &&
+				(attainment.value === 'both' || d.attainment === attainment.value) &&
+				(gender.value === 'both' || d.gender === gender.value));
 
-	function invalidate(e) {
-		data = INCENTIVES.filter(function (el) {
-			return ((gender.value === 'both' || el.gender === gender.value) &&
-				(attainment.value === 'both' || el.attainment === attainment.value));
+			// Does this row have values for each property we're using?
+			var i = 0;
+			while (include && i < properties.length) {
+				include = !isNaN(d[properties[i]]);
+				i++;
+			}
+
+			return include;
 		});
 
-		x.domain([0, d3.max(data, function (d) { return Math.abs(d.private_costs); })]);
-		xAxis.tickValues(data.map(function (d) { return Math.abs(d.private_costs); }));
+		// Convert the properties we're using to numbers.
+		data.forEach(function (d) {
+			for (var i = 0; i < properties.length; i++) {
+				var p = properties[i];
+				d[p] = +d[p];
+			}
+		});
 
-		y.domain([0, d3.max(data, function (d) { return d.private_benefits; })]);
-		yAxis.tickValues(data.map(function (d) { return d.private_benefits; }));
+		// Find the maximum total benefits
+		area.domain([0, d3.max(data, function (d) { return d['total benefits']; })]);
+		
+		// Nest the data by country.
+		data = nest.entries(data);
 
-		var circles = svg.selectAll('circle')
-			.data(data, function (d) { return d.country + d.gender + d.attainment; });
+		height = margin.top + margin.bottom + (colWidth + padding.top + padding.bottom) * (data.length);
+		d3.select('#benefits').attr('height', height);
 
-		circles.enter().append('circle')
-			.attr('r', 5)
-			.attr('class', function (d) { return d.attainment + '_' + d.gender; })
-			.on('mouseover', function (d) {
-				circles.filter(function (c) { return d.country !== c.country; })
-					.transition().duration(750)
-					.attr('opacity', 0.2);
-				console.log(d.country + ' ' + d.private_npv);
+		var incentive = svg.selectAll('.incentive').data(data, function (d) { return d.key; })
+			.enter().append('g')
+				.attr('class', 'incentive')
+				.attr('transform', function (d, i) {
+					var h = colWidth + padding.top + padding.bottom;
+					var y = h + i * h;
+
+					return 'translate(0,' + y + ')';
+				});
+
+		incentive.selectAll('.country')
+			.data(function (d) { return d.key.split(' '); })
+			.enter().append('text')
+			.attr('class', 'country')
+			.attr('y', -colWidth/4)
+			.attr('dy', function (d, i) {
+				return i*14;
 			})
-			.on('mouseout', function (d) { circles.transition().duration(750).attr('opacity', 1); });
+			.text(String);
 
-		circles.transition().duration(500)
-			.attr('cx', function (d) { return x(Math.abs(d.private_costs)); })
-			.attr('cy', function (d) { return y(d.private_benefits); });
+		var iceberg = incentive.selectAll('.iceberg')
+			.data(function (d) {
+				return d.values;
+			},
+				function (d) { return [d.country, d.attainment, d.gender].join('|'); })
+			.enter().append('g')
+			.attr('transform', function (d, i) {
+				var x = padding.left + i * (colWidth + padding.left + padding.right);
+				return 'translate(' + x + ',0)';
+			});
 
-		circles.exit()
-			.transition().duration(750)
-			.attr('r', 0)
-			.remove();
+		iceberg.append('path')
+			.attr('class', 'total_benefits')
+			.attr('d', totalBenefits);
 
-		svg.append('g')
-			.attr('class', 'x axis')
-			.attr('transform', 'translate(0,' + height + ')')
-			.call(xAxis);
+		iceberg.append('text')
+			.attr('class', 'npv')
+			.attr('x', function (d) {
+				var s = Math.floor(side(area(d['net present value']))),
+					h = triangleHeight(s),
+					y = h/2,
+					x = 6 + colWidth/2 + (y/Math.tan(Math.PI / 3));
 
-		svg.append('g')
-			.attr('class', 'y axis')
-			.call(yAxis);
+				return x;
+			})
+			.attr('y', function (d) {
+				var s = Math.floor(side(area(d['net present value']))),
+					h = triangleHeight(s);
+					y = h/2;
 
-		svg.selectAll('.x text')
-			.style('display', function (d) { return (d === x.domain()[1]) ? null : 'none'; });
+					return -y;
+			})
+			.text(function (d) { return dollars(d['net present value']); });
 
-		svg.selectAll('.y text')
-			.style('display', function (d) { return (d === y.domain()[1]) ? null : 'none'; });
+		iceberg.append('path')
+			.attr('class', 'npv')
+			.attr('d', netPresentValue)
+			.on('mouseover', function (d) {
+				console.log([d.country, d.attainment, d.gender].join(' '));
+			});
+
+		iceberg.append('text')
+			.attr('class', 'total-costs')
+			.attr('x', colWidth / 2)
+			.attr('y', function (d) {
+				var npv_s = side(area(d['net present value'])),
+					npv_h = triangleHeight(npv_s),
+					total_s = side(area(d['total benefits'])),
+					total_h = triangleHeight(total_s);
+
+				return (total_h - npv_h) + 14;
+			})
+			.text(function (d) { return dollars(d['total costs']); });
+
+			iceberg.append('text')
+				.attr('class', 'total-benefits')
+				.attr('x', colWidth / 2)
+				.attr('y', function (d) {
+					var npv_s = side(area(d['net present value'])),
+						npv_h = triangleHeight(npv_s);
+
+					return -npv_h - 4;
+				}).text(function (d) { return dollars(d['total benefits']); });
+	});
+
+	function netPresentValue(d) {
+		var s = Math.round(side(area(d['net present value'])));
+		var h = -triangleHeight(s);
+		var x = Math.round((colWidth - s) / 2);
+		var f = d3.format('d');
+
+		return 'M' + f(x) + ' 0h'  + f(s) + 'l' + f(Math.round(-s/2)) + ' ' + f(h) + 'z';
+	}
+
+	function totalBenefits(d) {
+		var s = Math.round(side(area(d['total benefits'])));
+		var h = triangleHeight(s);
+		var npv_s = Math.round(side(area(d['net present value'])));
+		var npv_h = triangleHeight(npv_s);
+		var x = Math.round((colWidth - npv_s) / 2) + Math.round(npv_s / 2);
+		var f = d3.format('d');
+
+		return 'M' + f(x) + ' ' + f(-npv_h) + 'l' +
+			f(Math.round(-s/2)) + ' ' + f(h) + 'h' + f(s) + 'z';
+	}
+
+	function side(a) {
+		var s = Math.sqrt(4 * a / Math.sqrt(3));
+
+		return s;
+	}
+
+	function triangleHeight(s) {
+		return Math.round(s*Math.sqrt(3)/2);
+	}
+
+	function dollars(x) {
+		var format = d3.format(',.0f');
+
+		return '$' + format(x);
 	}
 })();
