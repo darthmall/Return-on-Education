@@ -1,105 +1,201 @@
 (function() {
-	function gender(d) {
-		return d.gender;
-	}
+	// Set up the dimensions
+	var margin = { top: 10, right: 10, bottom: 100, left: 100 },
+		padding = {top: 5, right: 5, bottom: 15, left: 5},
+		width = benefits.clientWidth - margin.left - margin.right,
+		height = benefits.clientHeight - margin.top - margin.bottom;
 
-	function r(d) {
-		return Math.sqrt(a(d.private_benefits) / Math.PI);
-	}
+	// Create a scale for the area of the triangle based on the width of the SVG
+	var colWidth = width/4 - padding.left - padding.right;
+	var area = d3.scale.linear().range([0, Math.pow(colWidth, 2) * Math.sqrt(3) / 4]);
 
-	function onTick(e) {
-		var q = d3.geom.quadtree(all),
-			i = 0,
-			n = all.length;
+	// Groups for the different charts
+	var svg = d3.select('#benefits')
+		.append('g')
+			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-		while (++i < n) {
-			q.visit(collide(all[i]));
-		}
+	var nest = d3.nest()
+		.key(function (d) { return d.country; });
 
-		svg.selectAll("circle")
-			.attr("cx", function(d) { return d.x; })
-			.attr("cy", function(d) { return d.y; });
+	var properties = ['total costs', 'total benefits', 'net present value'];
 
-		return false;
-	}
+	var headers = d3.select('.headers')
+		.style('margin-left', margin.left + 'px')
+		.style('margin-right', margin.right + 'px')
+		.style('margin-top', padding.top + 'px');
+	var headerOffset = offset(headers[0][0]);
 
-	function collide(node) {
-		var r = node.radius + 16,
-			nx1 = node.x - r,
-			nx2 = node.x + r,
-			ny1 = node.y - r,
-			ny2 = node.y + r;
+	headers.selectAll('th')
+		.style('width', (width/4) + 'px');
 
-		return function(quad, x1, y1, x2, y2) {
-			if (quad.point && (quad.point !== node)) {
-				var _x = node.x - quad.point.x,
-					_y = node.y - quad.point.y,
-					l = Math.sqrt(_x * _x + _y * _y),
-					r = node.radius + quad.point.radius;
+	window.addEventListener('scroll', function (e) {
+		headers.style('top', Math.max(0, window.pageYOffset - headerOffset) + 'px');
+	});
 
-				if (l < r) {
-					l = (l - r) / l * 0.5;
-					node.x -= _x *= l;
-					node.y -= _y *= l;
-					node.x = Math.min(Math.max(node.x, node.radius), w - node.radius);
-					node.y = Math.min(Math.max(node.y, node.radius), h - node.radius);
-					node.y += (y(node.benefit_ratio) - node.y) * 0.1;
+	d3.csv('data/incentives.csv', function (csv) {
 
-					quad.point.x += _x;
-					quad.point.y += _y;
-					quad.point.x = Math.min(Math.max(quad.point.x, quad.point.radius), w - quad.point.radius);
-					quad.point.y = Math.min(Math.max(quad.point.y, quad.point.radius), h - quad.point.radius);
-					quad.point.y += (y(quad.point.benefit_ratio) - quad.point.y) * 0.1;
-				}
+		// Filter out only the rows we want
+		var data = csv.filter(function (d) {
+
+			// Does this row match our filter criteria?
+			var include = (d.sector === sector.value &&
+				(attainment.value === 'both' || d.attainment === attainment.value) &&
+				(gender.value === 'both' || d.gender === gender.value));
+
+			// Does this row have values for each property we're using?
+			var i = 0;
+			while (include && i < properties.length) {
+				include = !isNaN(d[properties[i]]);
+				i++;
 			}
 
-			return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-		};
-	}
-
-	var w = 900, h = 600,
-		svg = d3.select('#benefits').attr('width', w).attr('height', h),
-		post_secondary = svg.append('g').attr('class', 'post_secondary'),
-		tertiary = svg.append('g').attr('class', 'tertiary'),
-		all = POST_SECONDARY.concat(TERTIARY).filter(function(el) { return el.benefit_ratio !== null; }),
-		benefit_range = d3.extent(all, function (d) { return d.benefit_ratio; }),
-		y = d3.scale.log().range([h-30, 30])
-			.domain(benefit_range),
-		a = d3.scale.linear().range([Math.PI * 25, Math.PI * 1000])
-			.domain(d3.extent(all, function (d) { return d.private_benefits; }));
-
-		all.forEach(function (el, arr, idx) {
-			el.x = Math.random() * (w - 100) + 50;
-			el.y = y(el.benefit_ratio);
-			el.radius = r(el);
+			return include;
 		});
 
-		post_secondary.selectAll('circle').data(POST_SECONDARY.filter(function(el) { return el.benefit_ratio !== null; }))
-			.enter()
-			.append('circle')
-			.attr('cx', function (d) { return d.x; })
-			.attr('cy', function (d) { return d.y; })
-			.attr('r', function (d) { return d.radius; })
-			.attr('class', gender);
+		// Convert the properties we're using to numbers.
+		data.forEach(function (d) {
+			for (var i = 0; i < properties.length; i++) {
+				var p = properties[i];
+				d[p] = +d[p];
+			}
+		});
 
-		tertiary.selectAll('circle').data(TERTIARY.filter(function(el) { return el.benefit_ratio !== null; }))
-			.enter()
-			.append('circle')
-			.attr('cx', function (d) { return d.x; })
-			.attr('cy', function (d) { return d.y; })
-			.attr('r', function (d) { return d.radius; })
-			.attr('class', gender);
+		// Find the maximum total benefits
+		area.domain([0, d3.max(data, function (d) { return d['total benefits']; })]);
+		
+		// Nest the data by country.
+		data = nest.entries(data);
 
-		svg.selectAll('line').data([1, 2])
-			.enter()
-			.append('line')
-			.attr('x1', 0)
-			.attr('y1', y)
-			.attr('x2', w)
-			.attr('y2', y)
-			.attr('stroke', function (d) { return (d === 1) ? '#333333' : '#aaaaaa'; });
+		height = margin.top + margin.bottom + (colWidth + padding.top + padding.bottom) * (data.length);
+		d3.select('#benefits').attr('height', height);
 
-		svg.selectAll('circle')
-			.on('mouseover', function (d) { console.log(d.country + ': ' + d.benefit_ratio); });
-		d3.timer(onTick);
+		var incentive = svg.selectAll('.incentive').data(data, function (d) { return d.key; })
+			.enter().append('g')
+				.attr('class', 'incentive')
+				.attr('transform', function (d, i) {
+					var h = colWidth + padding.top + padding.bottom;
+					var y = h + i * h;
+
+					return 'translate(0,' + y + ')';
+				});
+
+		incentive.selectAll('.country')
+			.data(function (d) { return d.key.split(' '); })
+			.enter().append('text')
+			.attr('class', 'country')
+			.attr('y', -colWidth/4)
+			.attr('dy', function (d, i) {
+				return i*14;
+			})
+			.text(String);
+
+		var iceberg = incentive.selectAll('.iceberg')
+			.data(function (d) {
+				return d.values;
+			},
+				function (d) { return [d.country, d.attainment, d.gender].join('|'); })
+			.enter().append('g')
+			.attr('transform', function (d, i) {
+				var x = padding.left + i * (colWidth + padding.left + padding.right);
+				return 'translate(' + x + ',0)';
+			});
+
+		iceberg.append('path')
+			.attr('class', 'total_benefits')
+			.attr('d', totalBenefits);
+
+		iceberg.append('text')
+			.attr('class', 'npv')
+			.attr('x', function (d) {
+				var s = Math.floor(side(area(d['net present value']))),
+					h = triangleHeight(s),
+					y = h/2,
+					x = 6 + colWidth/2 + (y/Math.tan(Math.PI / 3));
+
+				return x;
+			})
+			.attr('y', function (d) {
+				var s = Math.floor(side(area(d['net present value']))),
+					h = triangleHeight(s);
+					y = h/2;
+
+					return -y;
+			})
+			.text(function (d) { return dollars(d['net present value']); });
+
+		iceberg.append('path')
+			.attr('class', 'npv')
+			.attr('d', netPresentValue)
+			.on('mouseover', function (d) {
+				console.log([d.country, d.attainment, d.gender].join(' '));
+			});
+
+		iceberg.append('text')
+			.attr('class', 'total-costs')
+			.attr('x', colWidth / 2)
+			.attr('y', function (d) {
+				var npv_s = side(area(d['net present value'])),
+					npv_h = triangleHeight(npv_s),
+					total_s = side(area(d['total benefits'])),
+					total_h = triangleHeight(total_s);
+
+				return (total_h - npv_h) + 14;
+			})
+			.text(function (d) { return dollars(d['total costs']); });
+
+			iceberg.append('text')
+				.attr('class', 'total-benefits')
+				.attr('x', colWidth / 2)
+				.attr('y', function (d) {
+					var npv_s = side(area(d['net present value'])),
+						npv_h = triangleHeight(npv_s);
+
+					return -npv_h - 4;
+				}).text(function (d) { return dollars(d['total benefits']); });
+	});
+
+	function netPresentValue(d) {
+		var s = Math.round(side(area(d['net present value'])));
+		var h = -triangleHeight(s);
+		var x = Math.round((colWidth - s) / 2);
+		var f = d3.format('d');
+
+		return 'M' + f(x) + ' 0h'  + f(s) + 'l' + f(Math.round(-s/2)) + ' ' + f(h) + 'z';
+	}
+
+	function totalBenefits(d) {
+		var s = Math.round(side(area(d['total benefits'])));
+		var h = triangleHeight(s);
+		var npv_s = Math.round(side(area(d['net present value'])));
+		var npv_h = triangleHeight(npv_s);
+		var x = Math.round((colWidth - npv_s) / 2) + Math.round(npv_s / 2);
+		var f = d3.format('d');
+
+		return 'M' + f(x) + ' ' + f(-npv_h) + 'l' +
+			f(Math.round(-s/2)) + ' ' + f(h) + 'h' + f(s) + 'z';
+	}
+
+	function side(a) {
+		var s = Math.sqrt(4 * a / Math.sqrt(3));
+
+		return s;
+	}
+
+	function triangleHeight(s) {
+		return Math.round(s*Math.sqrt(3)/2);
+	}
+
+	function dollars(x) {
+		var format = d3.format(',.0f');
+
+		return '$' + format(x);
+	}
+
+	function offset(el) {
+		if (el.offsetParent) {
+			return el.offsetTop + offset(el.offsetParent);
+		}
+
+		return el.offsetTop;
+	}
 })();

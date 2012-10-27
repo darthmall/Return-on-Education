@@ -60,31 +60,44 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-.male {
-    stroke-width: 2px;
-    stroke: #1E324A;
+body {
+    width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.female {
-    stroke-width: 4px;
-    stroke: #E03A8C;
+svg {
+    display: block;
 }
 
-.post_secondary circle {
-    fill: white;
+.npv {
+    fill: #0770A2;
 }
 
-.tertiary .male {
-    fill: #1E324A;
+.total_benefits {
+    fill: #82D9F7;
 }
 
-.tertiary .female {
-    fill: #E03A8C;
+text{
+    font-size: 12px;
 }
 
+.country {
+    text-anchor: end;
+}
 
+.total-benefits,
+.total-costs {
+    text-anchor: middle;
+}
 
+.headers {
+    position: relative;
+}
 
+.headers th {
+    background-color: rgba(255, 255, 255, 0.8);
+}
 
 /* ==========================================================================
    Media Queries

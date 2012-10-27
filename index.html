@@ -14,11 +14,46 @@
     </head>
     <body>
 
-        <h1>Who Benefits from Higher Education?</h1>
-        <svg id="benefits"></svg>
+        <h1>What Are the Financial Incentives of Higher Education?</h1>
 
-        <script src="http://d3js.org/d3.v2.min.js"></script>
-        <script src="js/data.js"></script>
+        <label for="sector">Display</label>
+        <select id="sector" name="sector" class="sector">
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+        </select>
+        
+        <label for="attainment">Level of Attainment</label>
+        <select id="attainment" name="attainment" class="filter">
+            <option value="both">Post-Secondary &amp; Tertiary</option>
+            <option value="post-secondary">Post-Secondary</option>
+            <option value="tertiary">Tertiary</option>
+        </select>
+
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender" class="filter">
+            <option value="both">Women &amp; Men</option>
+            <option value="female">Women</option>
+            <option value="male">Men</option>
+        </select>
+
+        <table class="headers">
+            <thead>
+                <tr>
+                    <th colspan="2">Post-Secondary</th>
+                    <th colspan="2">Tertiary</th>
+                </tr>
+                <tr>
+                    <th>Men</th>
+                    <th>Women</th>
+                    <th>Men</th>
+                    <th>Women</th>
+                </tr>
+            </thead>
+        </table>
+        <svg id="benefits" width="960", height="700"></svg>
+
+        <script src="js/d3.v2.min.js"></script>
+        <script src="js/incentives.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>
