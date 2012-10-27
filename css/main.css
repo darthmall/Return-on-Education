@@ -90,6 +90,15 @@ text{
 .total-costs {
     text-anchor: middle;
 }
+
+.headers {
+    position: relative;
+}
+
+.headers th {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
 /* ==========================================================================
    Media Queries
    ========================================================================== */

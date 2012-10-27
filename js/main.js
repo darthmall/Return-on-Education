@@ -19,6 +19,19 @@
 
 	var properties = ['total costs', 'total benefits', 'net present value'];
 
+	var headers = d3.select('.headers')
+		.style('margin-left', margin.left + 'px')
+		.style('margin-right', margin.right + 'px')
+		.style('margin-top', padding.top + 'px');
+	var headerOffset = offset(headers[0][0]);
+
+	headers.selectAll('th')
+		.style('width', (width/4) + 'px');
+
+	window.addEventListener('scroll', function (e) {
+		headers.style('top', Math.max(0, window.pageYOffset - headerOffset) + 'px');
+	});
+
 	d3.csv('data/incentives.csv', function (csv) {
 
 		// Filter out only the rows we want
@@ -176,5 +189,13 @@
 		var format = d3.format(',.0f');
 
 		return '$' + format(x);
+	}
+
+	function offset(el) {
+		if (el.offsetParent) {
+			return el.offsetTop + offset(el.offsetParent);
+		}
+
+		return el.offsetTop;
 	}
 })();
