@@ -12,14 +12,24 @@ function npv(container) {
 
     // Initialize the x, y, and radii of the circles
     filtered.forEach(function (d) {
-      if (Math.random() <= 0.5) {
-        d.x = _x(d.value['private']['net present value']);
-      } else {
-        d.x = _size[0] - _x(d.value['private']['net present value']);
+      if (!d.hasOwnProperty('x')) {
+        if (Math.random() <= 0.5) {
+          d.x = _x(d.value['private']['net present value']);
+        } else {
+          d.x = _size[0] - _x(d.value['private']['net present value']);
+        }
       }
 
-      d.y = _y(d.value['private']['total costs']);
-      d.radius = Math.sqrt(_area(d.value['private']['net present value']));
+      if (!d.hasOwnProperty('radius')) {
+        d.radius = Math.sqrt(_area(d.value['private']['net present value']));
+      }
+
+      if (!d.hasOwnProperty('y')) {
+        d.y = _y(d.value['private']['total costs']);
+        _boundingRadius = Math.max(_boundingRadius, Math.abs(d.y - (_size[1] / 2)) + d.radius);
+      }
+
+
     });
 
     var circle = container.selectAll('circle').data(filtered, function (d) { return d.key; });
@@ -54,6 +64,7 @@ function npv(container) {
         }
 
         container.selectAll('circle')
+          .each(buoancy(e.alpha))
           .attr('cx', function (d) { return d.x; })
           .attr('cy', function (d) { return d.y; });
       });
@@ -113,10 +124,30 @@ function npv(container) {
     var that = this;
 
     return function (d) {
-      var center = _size[1] / 2;
-      var targetY = center - (_color(d['total costs']) - 2) / 2 * center;
+      var center = _size[1] / 2,
+        costCategory = 0;
 
-      d.y = d.y + (targetY - d.y) * (_force.gravity() + 0.02) * Math.pow(alpha, 3) * 100;
+      switch (_color(d)) {
+        case 'q0-4':
+          costCategory = -2;
+          break;
+
+        case 'q1-4':
+          costCategory = -1;
+          break;
+
+        case 'q2-4':
+          costCategory = 1;
+          break;
+
+        case 'q3-4':
+          costCategory = 2;
+          break;
+      }
+
+      var targetY = center - (costCategory - 2) / 2 * _boundingRadius;
+
+      d.y += (targetY - d.y) * _force.gravity() * Math.pow(alpha, 3) * 10;
     };
   }
 
@@ -158,6 +189,7 @@ function npv(container) {
     _x = d3.scale.linear(),
     _y = d3.scale.linear(),
     _size = [900, 500],
+    _boundingRadius = 0;
     _showTooltip = null,
     _hideTooltip = null,
     _color = null;

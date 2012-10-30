@@ -34,6 +34,7 @@
 
 			return c(d.value['private']['total costs']);
 		}
+		
 		var data = [];
 
 		// Convert the properties we're using to numbers.
