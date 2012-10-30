@@ -28,8 +28,6 @@ function npv(container) {
         d.y = _y(d.value['private']['total costs']);
         _boundingRadius = Math.max(_boundingRadius, Math.abs(d.y - (_size[1] / 2)) + d.radius);
       }
-
-
     });
 
     var circle = container.selectAll('circle').data(filtered, function (d) { return d.key; });
@@ -63,9 +61,11 @@ function npv(container) {
           q.visit(collide(filtered[i]));
         }
 
-        container.selectAll('circle')
-          .each(buoancy(e.alpha))
-          .attr('cx', function (d) { return d.x; })
+        if (_forces !== null) {
+          circle.each(_forces(e.alpha, _boundingRadius, 0.2));
+        }
+
+        circle.attr('cx', function (d) { return d.x; })
           .attr('cy', function (d) { return d.y; });
       });
 
@@ -78,6 +78,26 @@ function npv(container) {
       }
   
       _color = color;
+  
+      return chart;
+  };
+
+  chart.forces = function(forces) {
+      if (arguments.length < 1) {
+          return _forces;
+      }
+  
+      _forces = forces;
+  
+      return chart;
+  };
+
+  chart.gravity = function(gravity) {
+      if (arguments.length < 1) {
+          return _force.gravity();
+      }
+  
+      _force.gravity(gravity);
   
       return chart;
   };
@@ -118,37 +138,6 @@ function npv(container) {
   // Private methods.
   function charge(d) {
     return (d['net present value'] < 0) ? 0 : -Math.pow(d.radius, 2) / 8;
-  }
-
-  function buoancy(alpha) {
-    var that = this;
-
-    return function (d) {
-      var center = _size[1] / 2,
-        costCategory = 0;
-
-      switch (_color(d)) {
-        case 'q0-4':
-          costCategory = -2;
-          break;
-
-        case 'q1-4':
-          costCategory = -1;
-          break;
-
-        case 'q2-4':
-          costCategory = 1;
-          break;
-
-        case 'q3-4':
-          costCategory = 2;
-          break;
-      }
-
-      var targetY = center - (costCategory - 2) / 2 * _boundingRadius;
-
-      d.y += (targetY - d.y) * _force.gravity() * Math.pow(alpha, 3) * 10;
-    };
   }
 
   function collide(d) {
@@ -192,7 +181,8 @@ function npv(container) {
     _boundingRadius = 0;
     _showTooltip = null,
     _hideTooltip = null,
-    _color = null;
+    _color = null,
+    _forces = null;
 
   return chart;
 }

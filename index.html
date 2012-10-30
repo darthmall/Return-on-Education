@@ -19,6 +19,7 @@
 
         <nav class="row-fluid">
             <button id="showNPV" class="navbutton" data-article="npv">Net Present Value</button>
+            <button id="showGender" class="navbutton" data-article="gender">By Gender</button>
             <button id="showPublicCBA" class="navbutton" data-article="cba">Public Costs</button>
         </nav>
 
@@ -41,6 +42,11 @@
                     <h5>Public Costs</h5>
                     <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis.</p>
                 </article>
+
+                <article id="gender" style="display:none">
+                    <h2>Gender breakdown</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis.</p>
+                </article>
             </div>
 
             <div class="span10">
@@ -51,12 +57,6 @@
                     <option value="tertiary">Tertiary</option>
                 </select>
 
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" class="filter">
-                    <option value="both">Women &amp; Men</option>
-                    <option value="female">Women</option>
-                    <option value="male">Men</option>
-                </select>
                 <svg id="benefits" class="Reds"></svg>
             </div>
         </div>

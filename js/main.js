@@ -12,7 +12,9 @@
 		.append('g')
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-	var bubble = npv(svg).tooltip(showTooltip, hideTooltip).size([width, height - margin.top - margin.bottom]),
+	var bubble = npv(svg)
+			.tooltip(showTooltip, hideTooltip).size([width, height - margin.top - margin.bottom])
+			.forces(buoancy),
 		publicScatter = scatter(svg).size([width, height - margin.top - margin.bottom]);
 
 	var chart = bubble;
@@ -24,17 +26,9 @@
 		.key(function (d) { return d.sector; })
 		.rollup(function (d) { return d[0]; });
 
-	d3.csv('data/incentives.csv', function (csv) {
-		function color(d) {
-			var c = d3.scale.quantile()
-				.range(['q3-4', 'q2-4', 'q1-4', 'q0-4'])
-				.domain(d3.extent(csv.filter(function (d) {
-					return d.sector === 'private';
-				}), function (d) { return d['total costs']; }));
+	var color;
 
-			return c(d.value['private']['total costs']);
-		}
-		
+	d3.csv('data/incentives.csv', function (csv) {
 		var data = [];
 
 		// Convert the properties we're using to numbers.
@@ -51,6 +45,16 @@
 
 			d.id = [d.country, d.attainment, d.gender].join('-').replace(/\s+/g, '_');
 		});
+
+		color = function (d) {
+			var c = d3.scale.quantile()
+				.range(['q3-4', 'q2-4', 'q1-4', 'q0-4'])
+				.domain(d3.extent(csv.filter(function (d) {
+					return d.sector === 'private';
+				}), function (d) { return d['total costs']; }));
+
+			return c(d.value['private']['total costs']);
+		};
 
 		bubble.color(color);
 		publicScatter.color(color);
@@ -73,11 +77,8 @@
 		function invalidateData() {
 			// Filter out only the rows we want
 			data = d3.entries(nest.map(csv.filter(function (d) {
-
 				// Does this row match our filter criteria?
-				var include = ((attainment.value === 'both' || d.attainment === attainment.value) &&
-					(gender.value === 'both' || d.gender === gender.value));
-
+				var include = (attainment.value === 'both' || d.attainment === attainment.value);
 				return include;
 			})));
 
@@ -97,8 +98,12 @@
 
 			if (id === 'cba') {
 				chart = publicScatter;
+			} else if (id === 'gender') {
+				chart = bubble;
+				chart.gravity(0.1).forces(genderSort);
 			} else {
 				chart = bubble;
+				chart.gravity(0.1).forces(buoancy);
 			}
 
 			chart(data);
@@ -158,6 +163,56 @@
 		var format = d3.format(',.0f');
 
 		return '$' + format(x);
+	}
+
+	function costCategory(d) {
+		switch (color(d)) {
+				case 'q0-4':
+					return -2;
+
+				case 'q1-4':
+					return -1;
+
+				case 'q2-4':
+					return 1;
+
+				case 'q3-4':
+					return 2;
+			}
+	}
+
+	function buoancy(alpha, boundingRadius, g) {
+		var that = this;
+
+		return function (d) {
+			var center = (height - margin.top - margin.bottom) / 2,
+				cc = costCategory(d);
+
+			var targetY = center - cc / 2 * boundingRadius;
+
+			d.y += (targetY - d.y) * g * Math.pow(alpha, 3) * 100;
+		};
+	}
+
+	function genderSort(alpha, boundingRadius, g) {
+		var that = this;
+
+		return function (d) {
+			var w = width - margin.left - margin.right,
+				centerM = w * 0.125,
+				centerF = w * 0.875,
+				centerY = (height - margin.top - margin.bottom) / 2,
+				cc = costCategory(d),
+				targetY = centerY - cc / 2 * boundingRadius;
+
+			if (d.key.indexOf('female') >= 0) {
+				d.x += (centerF - d.x) * g * Math.pow(alpha, 3) * 1000;
+			} else {
+				d.x += (centerM - d.x) * g * Math.pow(alpha, 3) * 1000;
+			}
+
+			d.y += (targetY - d.y) * g * Math.pow(alpha, 3) * 100;
+		};
 	}
 
 })(jQuery);
