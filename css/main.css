@@ -30,6 +30,10 @@ text {
     font-size: 12px;
 }
 
+circle {
+    opacity: 0.8;
+}
+
 circle:hover {
     stroke: #333;
     stroke-width: 4;
@@ -54,10 +58,38 @@ circle:hover {
 .axis path,
 .axis line {
   fill: none;
-  stroke: #333;
+  stroke: #bbb;
   shape-rendering: crispEdges;
+}
+
+.axis text {
+    fill: #bbb;
+}
+
+.title {
+    text-anchor: middle;
 }
 
 .domain {
     display: none;
+}
+
+.reference {
+    stroke: #bbb;
+}
+
+.male.post_secondary {
+    fill: #53A5B6;
+}
+
+.male.tertiary {
+    fill: #0A527E;
+}
+
+.female.post_secondary {
+    fill: #E7BDC6;
+}
+
+.female.tertiary {
+    fill: #CB7C97;
 }

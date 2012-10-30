@@ -4,39 +4,88 @@ function scatter(container) {
         return d.value.hasOwnProperty('public') &&
           d.value.hasOwnProperty('private') &&
           !isNaN(d.value['public']['direct cost']) &&
-          !isNaN(d.value['private']['income tax effect']);
+          !isNaN(d.value['public']['net present value']);
       });
 
-      _x.domain([0, d3.max(filtered, function (d) { return Math.abs(d.value['public']['direct cost']); })]);
-      _y.domain([0, d3.max(filtered, function (d) { return Math.abs(d.value['private']['income tax effect']); })]);
+      _x.domain([0, d3.max(filtered, function (d) {
+        return Math.abs(d.value['private']['total costs']);
+      })]);
+      _y.domain([0, d3.max(filtered, function (d) {
+        return Math.abs(d.value['public']['total costs']);
+      })]);
 
       var xticks = [], yticks = [];
 
       filtered.forEach(function (d) {
-        d.x = _x(Math.abs(d.value['public']['direct cost']));
-        d.y = _y(Math.abs(d.value['private']['income tax effect']));
+        var priv = Math.abs(d.value['private']['total costs']);
+        var pub = Math.abs(d.value['public']['total costs']);
 
-        xticks.push(Math.abs(d.value['public']['direct cost']));
-        yticks.push(Math.abs(d.value['private']['net present value']));
+        d.x = _x(priv);
+        d.y = _y(pub);
+
+        if (xticks.indexOf(priv) < 0) {
+          xticks.push(priv);
+        }
+
+        if (yticks.indexOf(pub) < 0) {
+          yticks.push(pub);
+        }
       });
 
       _xaxis.scale(_x).tickValues(xticks);
       _yaxis.scale(_y).tickValues(yticks);
 
-      container.selectAll('.axis').style('display', null);
+      if (container.selectAll('.axis').empty()) {
+        container.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + _size[1] + ')')
+          .append('text')
+            .attr('class', 'title')
+            .attr('transform', 'translate(' + (_size[0]/2) + ',20)')
+            .text('Private Costs');
+
+        container.append('g').attr('class', 'y axis')
+          .append('text')
+            .attr('class', 'title')
+            .attr('transform', 'translate(-20,' + (_size[1]/2) + ') rotate(-90)')
+            .text('Public Costs');
+      }
 
       var t = d3.transition().duration(750);
 
       t.select('.x.axis')
-        .attr('transform', 'translate(0,' + _size[1] + ')')
+        .style('opacity', 1)
         .call(_xaxis)
-        .selectAll('text')
-        .style('display', function (d) { return (d === 0 || d === _x.domain()[1]) ? null : 'none'; });
+        .selectAll('text').filter(function (d) {
+          return !d3.select(this).classed('title');
+        })
+        .style('display', function (d, i) {
+          return (d === 0 || d === _x.domain()[1]) ? null : 'none';
+        });
 
       t.select('.y.axis')
+        .style('opacity', 1)
         .call(_yaxis)
-        .selectAll('text')
-        .style('display', function (d) { return (d === 0 || d === _y.domain()[1]) ? null : 'none'; });
+        .selectAll('text').filter(function (d) {
+          return !d3.select(this).classed('title');
+        })
+        .style('display', function (d, i) {
+          return (d === 0 || d === _y.domain()[1]) ? null : 'none';
+        });
+
+      var line = container.selectAll('.reference')
+          .data([Math.min(_x.domain()[1], _y.domain()[1])]);
+
+      line.enter().append('line')
+          .attr('class', 'reference')
+          .attr('x1', _x(0))
+          .attr('y1', _y(0));
+
+      line.transition().duration(750)
+          .attr('x1', _x(0))
+          .attr('y1', _y(0))
+          .attr('x2', _x)
+          .attr('y2', _y);
 
       var circle = container.selectAll('circle').data(filtered, function (d) { return d.key; });
 
@@ -80,7 +129,15 @@ function scatter(container) {
     };
 
     chart.stop = function() {
-      container.selectAll('.axis').style('display', 'none');
+      container.selectAll('.reference')
+        .transition().duration(750)
+          .attr('x2', _x(0))
+        .remove();
+
+      container.selectAll('.axis')
+        .transition().duration(750)
+          .style('opacity', 0)
+        .remove();
 
       return chart;
     };
@@ -109,8 +166,6 @@ function scatter(container) {
       _size = [900, 600],
       _color = null;
 
-    container.append('g').attr('class', 'x axis');
-    container.append('g').attr('class', 'y axis');
 
     return chart;
 }

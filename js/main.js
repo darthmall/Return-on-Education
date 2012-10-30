@@ -98,9 +98,6 @@
 
 			if (id === 'cba') {
 				chart = publicScatter;
-			} else if (id === 'gender') {
-				chart = bubble;
-				chart.gravity(0.1).forces(genderSort);
 			} else {
 				chart = bubble;
 				chart.gravity(0.1).forces(buoancy);
@@ -193,26 +190,4 @@
 			d.y += (targetY - d.y) * g * Math.pow(alpha, 3) * 100;
 		};
 	}
-
-	function genderSort(alpha, boundingRadius, g) {
-		var that = this;
-
-		return function (d) {
-			var w = width - margin.left - margin.right,
-				centerM = w * 0.125,
-				centerF = w * 0.875,
-				centerY = (height - margin.top - margin.bottom) / 2,
-				cc = costCategory(d),
-				targetY = centerY - cc / 2 * boundingRadius;
-
-			if (d.key.indexOf('female') >= 0) {
-				d.x += (centerF - d.x) * g * Math.pow(alpha, 3) * 1000;
-			} else {
-				d.x += (centerM - d.x) * g * Math.pow(alpha, 3) * 1000;
-			}
-
-			d.y += (targetY - d.y) * g * Math.pow(alpha, 3) * 100;
-		};
-	}
-
 })(jQuery);

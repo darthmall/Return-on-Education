@@ -37,7 +37,9 @@ function npv(container) {
       .attr('cy', function (d) { return d.y; });
 
     circle.enter().append('circle')
-      .attr('class', _color || null)
+      .attr('class', function (d) {
+        return d.key.split('-').join(' ');
+      })
       .attr('cx', function (d) { return d.x; })
       .attr('cy', function (d) { return d.y; })
       .on('mouseover', _showTooltip)
