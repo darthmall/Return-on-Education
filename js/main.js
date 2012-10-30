@@ -1,33 +1,41 @@
 (function($) {
 	// Set up the dimensions
-	var margin = { top: 10, right: 10, bottom: 10, left: 10 },
+	var margin = { top: 30, right: 30, bottom: 30, left: 100 },
 		padding = {top: 5, right: 5, bottom: 15, left: 5},
 		width = benefits.clientWidth - margin.left - margin.right,
-		height = benefits.clientHeight - margin.top - margin.bottom;
+		height = $(window).height() - $('#benefits').offset().top;
+
+	$('#benefits').height(height);
 
 	// Groups for the different charts
 	var svg = d3.select('#benefits')
 		.append('g')
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-	var bubble = npv(svg).tooltip(showTooltip, hideTooltip),
-		publicScatter = null;
+	var bubble = npv(svg).tooltip(showTooltip, hideTooltip).size([width, height - margin.top - margin.bottom]),
+		publicScatter = scatter(svg).size([width, height - margin.top - margin.bottom]);
 
-	var chart = bubble.size([width, height]);
+	var chart = bubble;
 
-	$('.navbutton').click(function (e) {
-		var id = e.target.getAttribute('data-article'),
-			articles = $('article');
-
-		console.log(id);
-		articles.filter(function (i) { return this.getAttribute('id') !== id; })
-			.css('display', 'none');
-
-		$('#' + id).css('display', 'block');
-
-	});
+	var nest = d3.nest()
+		.key(function (d) {
+			return [d.country, d.attainment, d.gender].join('-').replace(/\s+/g, '_');
+		})
+		.key(function (d) { return d.sector; })
+		.rollup(function (d) { return d[0]; });
 
 	d3.csv('data/incentives.csv', function (csv) {
+		function color(d) {
+			var c = d3.scale.quantile()
+				.range(['q3-4', 'q2-4', 'q1-4', 'q0-4'])
+				.domain(d3.extent(csv.filter(function (d) {
+					return d.sector === 'private';
+				}), function (d) { return d['total costs']; }));
+
+			return c(d.value['private']['total costs']);
+		}
+		var data = [];
+
 		// Convert the properties we're using to numbers.
 		csv.forEach(function (d) {
 			for (var k in d) {
@@ -43,63 +51,83 @@
 			d.id = [d.country, d.attainment, d.gender].join('-').replace(/\s+/g, '_');
 		});
 
-		$('.filter').change(invalidateData);
+		bubble.color(color);
+		publicScatter.color(color);
 
+		$('.filter').change(invalidateData);
 		$(window).resize(invalidateSize);
 
 		invalidateData();
 
 		function invalidateSize() {
 			var width = benefits.clientWidth - margin.left - margin.right,
-				height = benefits.clientHeight - margin.top - margin.bottom;
+				height = $(window).height() - $('#benefits').offset().top;
 
-			chart.size([width, height]);
+			$('#benefits').height(height);
+
+			chart.size([width, height - margin.top - margin.bottom]);
 			chart(data);
 		}
 
 		function invalidateData() {
 			// Filter out only the rows we want
-			data = csv.filter(function (d) {
+			data = d3.entries(nest.map(csv.filter(function (d) {
 
 				// Does this row match our filter criteria?
-				var include = (d.sector === 'private' &&
-					(attainment.value === 'both' || d.attainment === attainment.value) &&
+				var include = ((attainment.value === 'both' || d.attainment === attainment.value) &&
 					(gender.value === 'both' || d.gender === gender.value));
 
-				return include && !isNaN(d['net present value']) && !isNaN(d['total costs']);
-			});
-
-
-			data.sort(function (a, b) { return a['net present value'] - b['net present value']; });
+				return include;
+			})));
 
 			chart(data);
 		}
+
+		$('.navbutton').click(function (e) {
+			var id = e.target.getAttribute('data-article'),
+				articles = $('article');
+
+			articles.filter(function (i) { return this.getAttribute('id') !== id; })
+				.css('display', 'none');
+
+			$('#' + id).css('display', 'block');
+
+			chart.stop();
+
+			if (id === 'cba') {
+				chart = publicScatter;
+			} else {
+				chart = bubble;
+			}
+
+			chart(data);
+		});
 	});
 
 	function showTooltip(d) {
 		var offset = $('svg').offset();
 
 		var tooltip = $('<div></div>', {
-			'id': d.id,
+			'id': d.key,
 			'class': 'tooltip'
 		});
 
-		$('<h3>' + d.country + '</h3>', {'class': 'country'}).appendTo(tooltip);
+		$('<h3>' + d.value['private'].country + '</h3>', {'class': 'country'}).appendTo(tooltip);
 		$('<table><tr /><tr /><tr /></table>').appendTo(tooltip);
 
 		tooltip.find('tr').append(function (index, html) {
 			switch (index) {
 				case 0:
-					return '<td class="attainment">' + d.attainment + '</td>' +
-						'<td class="gender">' + d.gender + '</td>';
+					return '<td class="attainment">' + d.value['private'].attainment + '</td>' +
+						'<td class="gender">' + d.value['private'].gender + '</td>';
 
 				case 1:
 					return '<td>Net Present Value</td><td class="npv">' +
-						dollars(d['net present value']) + '</td>';
+						dollars(d.value['private']['net present value']) + '</td>';
 
 				case 2:
 					return '<td>Total Costs</td><td class="costs">' +
-						dollars(d['total costs']) + '</td>';
+						dollars(d.value['private']['total costs']) + '</td>';
 
 				default:
 					return '';
@@ -108,14 +136,13 @@
 
 		tooltip.appendTo('body');
 		tooltip.offset({
-			left: offset.left + d.x - tooltip.outerWidth() * 0.5,
-			top: offset.top + d.y - tooltip.outerHeight() - d.radius * 0.6
+			left: offset.left + d.x + margin.left - tooltip.outerWidth() * 0.5,
+			top: offset.top + d.y + margin.top - tooltip.outerHeight() - d.radius * 0.6
 		});
-
 	}
 
 	function hideTooltip(d) {
-		$('#' + d.id).remove();
+		$('#' + d.key).remove();
 	}
 
 	function sortCost(alpha) {

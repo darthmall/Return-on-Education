@@ -1,32 +1,35 @@
 function npv(container) {
   function chart(data) {
-    _x.domain(d3.extent(data, function (d) { return d['net present value']; }));
-    _y.domain(d3.extent(data, function (d) { return d['total costs']; }));
-    _area.domain([0, _x.domain()[1]]);
-    _color.domain(_y.domain());
-
-    // Initialize the x, y, and radii of the circles
-    data.forEach(function (d) {
-      if (Math.random() <= 0.5) {
-        d.x = _x(d['net present value']);
-      } else {
-        d.x = _size[0] - _x(d['net present value']);
-      }
-
-      d.y = _y(d['total costs']);
-      d.radius = Math.sqrt(_area(d['net present value']));
+    var filtered = data.filter(function (d) {
+      return d.value.hasOwnProperty('private') &&
+        !isNaN(d.value['private']['net present value']) &&
+        !isNaN(d.value['private']['total costs']);
     });
 
-    var circle = container.selectAll('circle').data(data, function (d) { return d.id; });
+    _x.domain(d3.extent(filtered, function (d) { return d.value['private']['net present value']; }));
+    _y.domain(d3.extent(filtered, function (d) { return d.value['private']['total costs']; }));
+    _area.domain([0, _x.domain()[1]]);
+
+    // Initialize the x, y, and radii of the circles
+    filtered.forEach(function (d) {
+      if (Math.random() <= 0.5) {
+        d.x = _x(d.value['private']['net present value']);
+      } else {
+        d.x = _size[0] - _x(d.value['private']['net present value']);
+      }
+
+      d.y = _y(d.value['private']['total costs']);
+      d.radius = Math.sqrt(_area(d.value['private']['net present value']));
+    });
+
+    var circle = container.selectAll('circle').data(filtered, function (d) { return d.key; });
 
     circle.transition().duration(750)
       .attr('cx', function (d) { return d.x; })
       .attr('cy', function (d) { return d.y; });
 
     circle.enter().append('circle')
-      .attr('class', function (d) {
-        return 'q' + (_color(d['total costs']) + 1) + '-5';
-      })
+      .attr('class', _color || null)
       .attr('cx', function (d) { return d.x; })
       .attr('cy', function (d) { return d.y; })
       .on('mouseover', _showTooltip)
@@ -40,24 +43,33 @@ function npv(container) {
       .attr('r', 0)
       .remove();
 
-    _force.nodes(data)
+    _force.nodes(filtered)
       .on('tick', function (e) {
-        var q = d3.geom.quadtree(data),
+        var q = d3.geom.quadtree(filtered),
           i = 0,
-          n = data.length;
+          n = filtered.length;
 
         while (++i < n) {
-          q.visit(collide(data[i]));
+          q.visit(collide(filtered[i]));
         }
 
         container.selectAll('circle')
-          // .each(buoancy(e.alpha))
           .attr('cx', function (d) { return d.x; })
           .attr('cy', function (d) { return d.y; });
       });
 
     _force.start();
   }
+
+  chart.color = function(color) {
+      if (arguments.length < 1) {
+          return _color;
+      }
+  
+      _color = color;
+  
+      return chart;
+  };
 
   chart.tooltip = function(show, hide) {
       if (arguments.length < 1) {
@@ -76,13 +88,18 @@ function npv(container) {
       return _size;
     }
 
-
     _size = dimensions;
 
     _x.range([0, _size[0] * 0.5]);
     _y.range([_size[1], 0]);
 
     _force.size(_size);
+
+    return chart;
+  };
+
+  chart.stop = function() {
+    _force.nodes([]).stop();
 
     return chart;
   };
@@ -136,13 +153,14 @@ function npv(container) {
   }
 
   // Private member variables.
-  var _force = d3.layout.force().charge(charge),
+  var _force = d3.layout.force().charge(charge).gravity(0.1).friction(0.9),
     _area = d3.scale.linear().range([0, Math.PI * 30 * 30]),
     _x = d3.scale.linear(),
     _y = d3.scale.linear(),
-    _color = d3.scale.quantile().range([3, 2, 1, 0]),
     _size = [900, 500],
-    _showTooltip, _hideTooltip;
+    _showTooltip = null,
+    _hideTooltip = null,
+    _color = null;
 
   return chart;
 }

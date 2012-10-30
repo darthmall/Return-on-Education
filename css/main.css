@@ -50,3 +50,14 @@ circle:hover {
     padding-left: 1.5em;
     text-align: right;
 }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #333;
+  shape-rendering: crispEdges;
+}
+
+.domain {
+    display: none;
+}
