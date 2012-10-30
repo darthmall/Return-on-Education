@@ -1,188 +1,162 @@
-(function() {
+(function($) {
 	// Set up the dimensions
-	var margin = { top: 10, right: 10, bottom: 100, left: 100 },
+	var margin = { top: 30, right: 30, bottom: 30, left: 100 },
 		padding = {top: 5, right: 5, bottom: 15, left: 5},
 		width = benefits.clientWidth - margin.left - margin.right,
-		height = benefits.clientHeight - margin.top - margin.bottom;
+		height = $(window).height() - $('#benefits').offset().top;
 
-	// Create a scale for the area of the triangle based on the width of the SVG
-	var colWidth = width/4 - padding.left - padding.right;
-	var area = d3.scale.linear().range([0, Math.pow(colWidth, 2) * Math.sqrt(3) / 4]);
+	$('#benefits').height(height);
 
 	// Groups for the different charts
 	var svg = d3.select('#benefits')
 		.append('g')
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+	var bubble = npv(svg)
+			.tooltip(showTooltip, hideTooltip).size([width, height - margin.top - margin.bottom])
+			.forces(buoancy),
+		publicScatter = scatter(svg).size([width, height - margin.top - margin.bottom]);
+
+	var chart = bubble;
+
 	var nest = d3.nest()
-		.key(function (d) { return d.country; });
+		.key(function (d) {
+			return [d.country, d.attainment, d.gender].join('-').replace(/\s+/g, '_');
+		})
+		.key(function (d) { return d.sector; })
+		.rollup(function (d) { return d[0]; });
 
-	var properties = ['total costs', 'total benefits', 'net present value'];
-
-	var headers = d3.select('.headers')
-		.style('margin-left', margin.left + 'px')
-		.style('margin-right', margin.right + 'px')
-		.style('margin-top', padding.top + 'px');
-	var headerOffset = offset(headers[0][0]);
-
-	headers.selectAll('th')
-		.style('width', (width/4) + 'px');
-
-	window.addEventListener('scroll', function (e) {
-		headers.style('top', Math.max(0, window.pageYOffset - headerOffset) + 'px');
-	});
+	var color;
 
 	d3.csv('data/incentives.csv', function (csv) {
-
-		// Filter out only the rows we want
-		var data = csv.filter(function (d) {
-
-			// Does this row match our filter criteria?
-			var include = (d.sector === sector.value &&
-				(attainment.value === 'both' || d.attainment === attainment.value) &&
-				(gender.value === 'both' || d.gender === gender.value));
-
-			// Does this row have values for each property we're using?
-			var i = 0;
-			while (include && i < properties.length) {
-				include = !isNaN(d[properties[i]]);
-				i++;
-			}
-
-			return include;
-		});
+		var data = [];
 
 		// Convert the properties we're using to numbers.
-		data.forEach(function (d) {
-			for (var i = 0; i < properties.length; i++) {
-				var p = properties[i];
-				d[p] = +d[p];
+		csv.forEach(function (d) {
+			for (var k in d) {
+				if (d.hasOwnProperty(k)) {
+					var v = +d[k];
+
+					if (!isNaN(v)) {
+						d[k] = v;
+					}
+				}
+			}
+
+			d.id = [d.country, d.attainment, d.gender].join('-').replace(/\s+/g, '_');
+		});
+
+		color = function (d) {
+			var c = d3.scale.quantile()
+				.range(['q3-4', 'q2-4', 'q1-4', 'q0-4'])
+				.domain(d3.extent(csv.filter(function (d) {
+					return d.sector === 'private';
+				}), function (d) { return d['total costs']; }));
+
+			return c(d.value['private']['total costs']);
+		};
+
+		bubble.color(color);
+		publicScatter.color(color);
+
+		$('.filter').change(invalidateData);
+		$(window).resize(invalidateSize);
+
+		invalidateData();
+
+		function invalidateSize() {
+			var width = benefits.clientWidth - margin.left - margin.right,
+				height = $(window).height() - $('#benefits').offset().top;
+
+			$('#benefits').height(height);
+
+			chart.size([width, height - margin.top - margin.bottom]);
+			chart(data);
+		}
+
+		function invalidateData() {
+			// Filter out only the rows we want
+			data = d3.entries(nest.map(csv.filter(function (d) {
+				// Does this row match our filter criteria?
+				var include = (attainment.value === 'both' || d.attainment === attainment.value);
+				return include;
+			})));
+
+			chart(data);
+		}
+
+		$('.navbutton').click(function (e) {
+			var id = e.target.getAttribute('data-article'),
+				articles = $('article');
+
+			articles.filter(function (i) { return this.getAttribute('id') !== id; })
+				.css('display', 'none');
+
+			$('#' + id).css('display', 'block');
+
+			chart.stop();
+
+			if (id === 'cba') {
+				chart = publicScatter;
+			} else if (id === 'gender') {
+				chart = bubble;
+				chart.gravity(0.1).forces(genderSort);
+			} else {
+				chart = bubble;
+				chart.gravity(0.1).forces(buoancy);
+			}
+
+			chart(data);
+		});
+	});
+
+	function showTooltip(d) {
+		var offset = $('svg').offset();
+
+		var tooltip = $('<div></div>', {
+			'id': d.key,
+			'class': 'tooltip'
+		});
+
+		$('<h3>' + d.value['private'].country + '</h3>', {'class': 'country'}).appendTo(tooltip);
+		$('<table><tr /><tr /><tr /></table>').appendTo(tooltip);
+
+		tooltip.find('tr').append(function (index, html) {
+			switch (index) {
+				case 0:
+					return '<td class="attainment">' + d.value['private'].attainment + '</td>' +
+						'<td class="gender">' + d.value['private'].gender + '</td>';
+
+				case 1:
+					return '<td>Net Present Value</td><td class="npv">' +
+						dollars(d.value['private']['net present value']) + '</td>';
+
+				case 2:
+					return '<td>Total Costs</td><td class="costs">' +
+						dollars(d.value['private']['total costs']) + '</td>';
+
+				default:
+					return '';
 			}
 		});
 
-		// Find the maximum total benefits
-		area.domain([0, d3.max(data, function (d) { return d['total benefits']; })]);
-		
-		// Nest the data by country.
-		data = nest.entries(data);
-
-		height = margin.top + margin.bottom + (colWidth + padding.top + padding.bottom) * (data.length);
-		d3.select('#benefits').attr('height', height);
-
-		var incentive = svg.selectAll('.incentive').data(data, function (d) { return d.key; })
-			.enter().append('g')
-				.attr('class', 'incentive')
-				.attr('transform', function (d, i) {
-					var h = colWidth + padding.top + padding.bottom;
-					var y = h + i * h;
-
-					return 'translate(0,' + y + ')';
-				});
-
-		incentive.selectAll('.country')
-			.data(function (d) { return d.key.split(' '); })
-			.enter().append('text')
-			.attr('class', 'country')
-			.attr('y', -colWidth/4)
-			.attr('dy', function (d, i) {
-				return i*14;
-			})
-			.text(String);
-
-		var iceberg = incentive.selectAll('.iceberg')
-			.data(function (d) {
-				return d.values;
-			},
-				function (d) { return [d.country, d.attainment, d.gender].join('|'); })
-			.enter().append('g')
-			.attr('transform', function (d, i) {
-				var x = padding.left + i * (colWidth + padding.left + padding.right);
-				return 'translate(' + x + ',0)';
-			});
-
-		iceberg.append('path')
-			.attr('class', 'total_benefits')
-			.attr('d', totalBenefits);
-
-		iceberg.append('text')
-			.attr('class', 'npv')
-			.attr('x', function (d) {
-				var s = Math.floor(side(area(d['net present value']))),
-					h = triangleHeight(s),
-					y = h/2,
-					x = 6 + colWidth/2 + (y/Math.tan(Math.PI / 3));
-
-				return x;
-			})
-			.attr('y', function (d) {
-				var s = Math.floor(side(area(d['net present value']))),
-					h = triangleHeight(s);
-					y = h/2;
-
-					return -y;
-			})
-			.text(function (d) { return dollars(d['net present value']); });
-
-		iceberg.append('path')
-			.attr('class', 'npv')
-			.attr('d', netPresentValue)
-			.on('mouseover', function (d) {
-				console.log([d.country, d.attainment, d.gender].join(' '));
-			});
-
-		iceberg.append('text')
-			.attr('class', 'total-costs')
-			.attr('x', colWidth / 2)
-			.attr('y', function (d) {
-				var npv_s = side(area(d['net present value'])),
-					npv_h = triangleHeight(npv_s),
-					total_s = side(area(d['total benefits'])),
-					total_h = triangleHeight(total_s);
-
-				return (total_h - npv_h) + 14;
-			})
-			.text(function (d) { return dollars(d['total costs']); });
-
-			iceberg.append('text')
-				.attr('class', 'total-benefits')
-				.attr('x', colWidth / 2)
-				.attr('y', function (d) {
-					var npv_s = side(area(d['net present value'])),
-						npv_h = triangleHeight(npv_s);
-
-					return -npv_h - 4;
-				}).text(function (d) { return dollars(d['total benefits']); });
-	});
-
-	function netPresentValue(d) {
-		var s = Math.round(side(area(d['net present value'])));
-		var h = -triangleHeight(s);
-		var x = Math.round((colWidth - s) / 2);
-		var f = d3.format('d');
-
-		return 'M' + f(x) + ' 0h'  + f(s) + 'l' + f(Math.round(-s/2)) + ' ' + f(h) + 'z';
+		tooltip.appendTo('body');
+		tooltip.offset({
+			left: offset.left + d.x + margin.left - tooltip.outerWidth() * 0.5,
+			top: offset.top + d.y + margin.top - tooltip.outerHeight() - d.radius * 0.6
+		});
 	}
 
-	function totalBenefits(d) {
-		var s = Math.round(side(area(d['total benefits'])));
-		var h = triangleHeight(s);
-		var npv_s = Math.round(side(area(d['net present value'])));
-		var npv_h = triangleHeight(npv_s);
-		var x = Math.round((colWidth - npv_s) / 2) + Math.round(npv_s / 2);
-		var f = d3.format('d');
-
-		return 'M' + f(x) + ' ' + f(-npv_h) + 'l' +
-			f(Math.round(-s/2)) + ' ' + f(h) + 'h' + f(s) + 'z';
+	function hideTooltip(d) {
+		$('#' + d.key).remove();
 	}
 
-	function side(a) {
-		var s = Math.sqrt(4 * a / Math.sqrt(3));
+	function sortCost(alpha) {
+		var that = this;
 
-		return s;
-	}
-
-	function triangleHeight(s) {
-		return Math.round(s*Math.sqrt(3)/2);
+		return function (d) {
+			d.y = d.y + (d.targetY - d.y) * (force.gravity() + 0.02) * alpha;
+		};
 	}
 
 	function dollars(x) {
@@ -191,11 +165,54 @@
 		return '$' + format(x);
 	}
 
-	function offset(el) {
-		if (el.offsetParent) {
-			return el.offsetTop + offset(el.offsetParent);
-		}
+	function costCategory(d) {
+		switch (color(d)) {
+				case 'q0-4':
+					return -2;
 
-		return el.offsetTop;
+				case 'q1-4':
+					return -1;
+
+				case 'q2-4':
+					return 1;
+
+				case 'q3-4':
+					return 2;
+			}
 	}
-})();
+
+	function buoancy(alpha, boundingRadius, g) {
+		var that = this;
+
+		return function (d) {
+			var center = (height - margin.top - margin.bottom) / 2,
+				cc = costCategory(d);
+
+			var targetY = center - cc / 2 * boundingRadius;
+
+			d.y += (targetY - d.y) * g * Math.pow(alpha, 3) * 100;
+		};
+	}
+
+	function genderSort(alpha, boundingRadius, g) {
+		var that = this;
+
+		return function (d) {
+			var w = width - margin.left - margin.right,
+				centerM = w * 0.125,
+				centerF = w * 0.875,
+				centerY = (height - margin.top - margin.bottom) / 2,
+				cc = costCategory(d),
+				targetY = centerY - cc / 2 * boundingRadius;
+
+			if (d.key.indexOf('female') >= 0) {
+				d.x += (centerF - d.x) * g * Math.pow(alpha, 3) * 1000;
+			} else {
+				d.x += (centerM - d.x) * g * Math.pow(alpha, 3) * 1000;
+			}
+
+			d.y += (targetY - d.y) * g * Math.pow(alpha, 3) * 100;
+		};
+	}
+
+})(jQuery);

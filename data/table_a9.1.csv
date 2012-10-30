@@ -1,0 +1,73 @@
+Country,Year,Direct cost,Foregone earnings,Total costs,Gross earnings benefits ,Income tax effect,Social contribution effect,Transfers effect,Unemployment effect,Total benefits,Net present value,Internal rate of return,Gender,Attainment,Sector
+Australia,2005,-2891,-22748,-25639,103116,-41661,0,-886,42163,102731,77092,0.14,male,post secondary,private
+Austria,2008,-1801,-45844,-47645,284884,-73822,-59487,-7587,35029,179017,131372,0.12,male,post secondary,private
+Belgium,,,,,,,,,,,,,male,post secondary,private
+Canada,2008,-3142,-28731,-31873,136984,-42770,-10510,-385,38762,122081,90208,0.14,male,post secondary,private
+Chile,,m,m,m,m,m,m,m,m,m,m,m,male,post secondary,private
+Czech Republic,2008,-2142,-17517,-19659,108257,-31801,-23905,0,83688,136240,116581,0.21,male,post secondary,private
+Denmark,2008,-746,-36225,-36971,187370,-80160,-17256,-13571,19357,95739,58768,0.11,male,post secondary,private
+Estonia,2008,-190,-12503,-12693,31071,-9246,-1260,0,17586,38151,25458,0.09,male,post secondary,private
+Finland,2008,-210,-30193,-30403,77946,-31681,-6879,-6961,31518,63943,33540,0.08,male,post secondary,private
+France,2008,-2632,-29772,-32404,114056,-24881,-20862,-3284,37503,102532,70129,0.11,male,post secondary,private
+Germany,2008,-3877,-35678,-39555,63972,-27911,-29948,-14223,79490,71380,31825,0.07,male,post secondary,private
+Greece,,m,m,m,m,m,m,m,m,m,m,m,male,post secondary,private
+Hungary,2008,-880,-13073,-13953,73813,-34401,-19706,0,42510,62216,48263,0.15,male,post secondary,private
+Iceland,,m,m,m,m,m,m,m,m,m,m,m,male,post secondary,private
+Ireland,2008,-620,-32896,-33515,243036,-89225,-17630,0,60310,196490,162975,0.15,male,post secondary,private
+Israel,2008,-1266,-30056,-31322,143387,-28405,-18920,0,26841,122903,91581,0.10,male,post secondary,private
+Italy,2008,-986,-43886,-44872,177073,-63514,-18903,0,22519,117174,72302,0.08,male,post secondary,private
+Japan,,,,,,,,,,,,,male,post secondary,private
+Korea,2008,-6069,-25378,-31447,171945,-8892,-16444,0,45808,192417,160970,0.17,male,post secondary,private
+Luxembourg,,m,m,m,m,m,m,m,m,m,m,m,male,post secondary,private
+Mexico,,m,m,m,m,m,m,m,m,m,m,m,male,post secondary,private
+Netherlands,,,,,,,,,,,,,male,post secondary,private
+New Zealand,2008,-3244,-33866,-37111,93186,-33648,-1463,-971,20258,77362,40251,0.07,male,post secondary,private
+Norway,2008,-2859,-53840,-56699,248839,-80412,-22351,-3187,38016,180905,124206,0.12,male,post secondary,private
+Poland,2008,-916,-16602,-17518,53311,-6965,-16753,0,24689,54282,36764,0.10,male,post secondary,private
+Portugal,2006,-12,-23445,-23456,212846,-53287,-23133,0,-3353,133074,109618,0.12,male,post secondary,private
+Slovak Republic,2008,-2358,-6324,-8682,106965,-37696,-30699,0,122421,160991,152309,0.41,male,post secondary,private
+Slovenia,2007,-2176,-18284,-20460,111618,-19595,-28948,0,19307,82381,61921,0.12,male,post secondary,private
+Spain,2008,-1464,-12551,-14015,95667,-25708,-7912,0,28987,91035,77020,0.11,male,post secondary,private
+Sweden,2008,-21,-29425,-29446,174618,-55711,-15255,-20046,42499,126105,96659,0.15,male,post secondary,private
+Switzerland,,m,m,,m,m,m,m,m,m,m,m,male,post secondary,private
+Turkey,2005,-336,-11218,-11554,63318,-10584,-10115,0,4017,46637,35082,0.10,male,post secondary,private
+United Kingdom,2008,-4880,-33603,-38483,218579,-50129,-27713,-9149,46772,178360,139877,0.13,male,post secondary,private
+United States,2008,-2888,-26755,-29643,292656,-70774,-25846,-5325,45392,236104,206461,0.20,male,post secondary,private
+OECD average,,-1944,-26817,-28761,143540,-41315,-18876,-3423,38884,118810,90049,0.13,male,post secondary,private
+EU21 average,,-1524,-25754,-27278,137358,-42102,-21544,-4401,41814,111124,83846,0.14,male,post secondary,private
+Australia,2005,-2891,-23470,-26361,88809,-28020,0,-17611,23261,66440,40079,0.11,female,post secondary,private
+Austria,2008,-1801,-44864,-46665,188626,-29485,-43040,-22993,29567,122675,76010,0.09,female,post secondary,private
+Belgium,,,,,,,,,,,,,female,post secondary,private
+Canada,2008,-3142,-29730,-32871,109365,-23190,-11278,-2192,19739,92443,59572,0.09,female,post secondary,private
+Chile,,m,m,m,m,m,m,m,m,m,m,m,female,post secondary,private
+Czech Republic,2008,-2142,-15950,-18092,97445,-26652,-20933,0,69776,119635,101543,0.22,female,post secondary,private
+Denmark,2008,-746,-35265,-36011,137856,-50090,-12363,0,10066,85469,49458,0.10,female,post secondary,private
+Estonia,2008,-180,-10993,-11173,46597,-11311,-1535,0,12466,46217,35044,0.21,female,post secondary,private
+Finland,2008,-210,-30803,-31013,54469,-17246,-5083,-15568,26412,42985,11972,0.05,female,post secondary,private
+France,2008,-2632,-28347,-30980,108028,-19605,-19025,-10229,31096,90265,59285,0.09,female,post secondary,private
+Germany,2008,-3877,-35784,-39662,122989,-31876,-34864,-36714,43778,63313,23651,0.06,female,post secondary,private
+Greece,,m,m,m,m,m,m,m,m,m,m,m,female,post secondary,private
+Hungary,2008,-880,-12304,-13184,85252,-32820,-21045,0,38518,69905,56721,0.16,female,post secondary,private
+Iceland,,m,m,m,m,m,m,m,m,m,m,m,female,post secondary,private
+Ireland,2008,-620,-36155,-36775,218100,-23313,-16064,0,19774,198498,161723,0.24,female,post secondary,private
+Israel,2008,-1266,-29067,-30333,107391,-6276,-6332,-82,16175,110876,80544,0.10,female,post secondary,private
+Italy,2008,-986,-38624,-39610,152167,-51238,-17293,0,29983,113620,74010,0.08,female,post secondary,private
+Japan,,,,,,,,,,,,,female,post secondary,private
+Korea,2008,-6069,-25021,-31090,71331,-1971,-9207,0,50039,110192,79101,0.13,female,post secondary,private
+Luxembourg,,m,m,m,m,m,m,m,m,m,m,m,female,post secondary,private
+Mexico,,m,m,m,m,m,m,m,m,m,m,m,female,post secondary,private
+Netherlands,,,,,,,,,,,,,female,post secondary,private
+New Zealand,2008,-3244,-33447,-36691,81687,-19232,-1205,-10028,11252,62474,25783,0.06,female,post secondary,private
+Norway,2008,-2859,-54055,-56914,149381,-41441,-13140,-13729,20335,101406,44492,0.06,female,post secondary,private
+Poland,2008,-916,-14879,-15794,74416,-8271,-19448,0,16433,63130,47335,0.11,female,post secondary,private
+Portugal,2006,-12,-20631,-20642,150215,-31104,-17731,0,10416,111796,91153,0.12,female,post secondary,private
+Slovak Republic,2008,-2358,-4464,-6822,81611,-27655,-22522,0,87101,118534,111712,0.43,female,post secondary,private
+Slovenia,2007,-2176,-18557,-20733,118292,-16877,-28104,-708,9009,81612,60879,0.11,female,post secondary,private
+Spain,2008,-1464,-11638,-13102,127362,-23551,-9849,0,28607,122569,109467,0.20,female,post secondary,private
+Sweden,2008,-21,-29252,-29273,132070,-42495,-12280,-28046,43892,93141,63868,0.11,female,post secondary,private
+Switzerland,,m,m,m,m,m,m,m,m,m,m,m,female,post secondary,private
+Turkey,2005,-336,-12058,-12394,75879,-8395,-9432,0,-12434,45618,33223,0.09,female,post secondary,private
+United Kingdom,2008,-4880,-34465,-39345,110415,-27011,-15010,-35051,39416,72759,33414,0.07,female,post secondary,private
+United States,2008,-2888,-27307,-30195,229708,-43137,-19464,-10332,24981,181756,151561,0.18,female,post secondary,private
+OECD average,,-1944,-26285,-28229,116778,-25690,-15450,-8131,27986,95493,67264,0.13,female,post secondary,private
+EU21 average,,-1524,-24881,-26404,117995,-27682,-18599,-8783,32136,95066,68662,0.14,female,post secondary,private
