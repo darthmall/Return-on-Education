@@ -58,12 +58,12 @@ circle:hover {
 .axis path,
 .axis line {
   fill: none;
-  stroke: #bbb;
+  stroke: #888;
   shape-rendering: crispEdges;
 }
 
 .axis text {
-    fill: #bbb;
+    fill: #888;
 }
 
 .title {
@@ -74,11 +74,11 @@ circle:hover {
     display: none;
 }
 
-.reference {
-    stroke: #bbb;
+.private_costs {
+    fill: #eee;
 }
 
-.male.post_secondary {
+.male.post-secondary {
     fill: #53A5B6;
 }
 
@@ -86,7 +86,7 @@ circle:hover {
     fill: #0A527E;
 }
 
-.female.post_secondary {
+.female.post-secondary {
     fill: #E7BDC6;
 }
 
