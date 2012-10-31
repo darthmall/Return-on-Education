@@ -28,8 +28,8 @@ function npv(container) {
       })
       .attr('cx', function (d) { return d.x; })
       .attr('cy', function (d) { return d.y; })
-      .on('mouseover', _showTooltip)
-      .on('mouseout', _hideTooltip);
+      .on('mouseover', showTooltip)
+      .on('mouseout', hideTooltip);
 
     circle.transition().duration(750)
       .attr('r', function (d) { return d.radius; });
@@ -66,17 +66,6 @@ function npv(container) {
       return chart;
   };
 
-  chart.tooltip = function(show, hide) {
-      if (arguments.length < 1) {
-          return [_showTooltip, _hideTooltip];
-      }
-
-      _showTooltip = show;
-      _hideTooltip = (arguments.length > 1) ? hide : show;
-  
-      return chart;
-  };
-
   // Public methods
   chart.size = function(dimensions) {
     if (arguments.length < 1) {
@@ -91,7 +80,13 @@ function npv(container) {
   };
 
   chart.stop = function() {
+    // Stop the force layout
     _force.nodes([]).stop();
+
+    // Unhook the event listeners
+    container.selectAll('circle')
+      .on('mouseover', null)
+      .on('mouseout', null);
 
     return chart;
   };
@@ -102,13 +97,46 @@ function npv(container) {
     return c;
   }
 
+  function dollars(x) {
+    var format = d3.format(',.0f');
+
+    return '$' + format(x);
+  }
+
+  function showTooltip(d) {
+    var translate = $(container[0][0]).offset(),
+      id = d.key.split(' '),
+      $tooltip = $('.tooltip').attr('id', id.join('_'));
+
+    // Clear out any old content.
+    $tooltip.children('.body').children().remove();
+
+    $tooltip.children('h3').text(id[0]);
+    $tooltip.children('.attainment').text(id[1]);
+    $tooltip.children('.gender').text(id[2]);
+
+    $('<table><tr /></table>').appendTo($tooltip.children('.body'));
+
+    $tooltip.find('tr').append(function (index, html) {
+      return '<td>Net Present Value</td><td class="npv">' +
+        dollars(d.value['private']) + '</td>';
+    });
+
+    $tooltip.css({
+      left: translate.left + d.x - $tooltip.outerWidth() * 0.5,
+      top: translate.top + d.y - $tooltip.outerHeight() - d.radius * 0.6
+    }).stop().fadeIn(750);
+  }
+
+  function hideTooltip(d) {
+    $('#' + d.key.replace(/\s+/g, '_')).stop().fadeOut(750).remove('.body > *').attr('id', null);
+  }
+
   // Private member variables.
   var _force = d3.layout.force().charge(charge).gravity(0),
     _area = d3.scale.linear().range([0, Math.PI * Math.pow(50, 2)]),
     _size = [900, 500],
     _gravity = 0.1,
-    _showTooltip = null,
-    _hideTooltip = null,
     _forces = null;
 
   return chart;

@@ -48,11 +48,18 @@ circle:hover {
     position: absolute;
 }
 
-.tooltip .gender,
 .tooltip .npv,
 .tooltip .costs {
     padding-left: 1.5em;
     text-align: right;
+}
+
+.tooltip h4 {
+    display: inline-block;
+}
+
+.tooltip .gender {
+    float: right;
 }
 
 .axis path,

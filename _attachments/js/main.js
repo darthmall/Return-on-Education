@@ -12,8 +12,7 @@
 		.append('g')
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-	var bubble = npv(svg)
-			.tooltip(showTooltip, hideTooltip).size([width, height - margin.top - margin.bottom]),
+	var bubble = npv(svg).size([width, height - margin.top - margin.bottom]),
 		publicScatter = scatter(svg).size([width, height - margin.top - margin.bottom]);
 
 	var chart = bubble;
@@ -62,47 +61,6 @@
 
 		chart.size([width, height - margin.top - margin.bottom]);
 		chart(data);
-	}
-
-	function showTooltip(d) {
-		var offset = $('svg').offset();
-
-		var tooltip = $('<div></div>', {
-			'id': d.key,
-			'class': 'tooltip'
-		});
-
-		$('<h3>' + d.value['private'].country + '</h3>', {'class': 'country'}).appendTo(tooltip);
-		$('<table><tr /><tr /><tr /></table>').appendTo(tooltip);
-
-		tooltip.find('tr').append(function (index, html) {
-			switch (index) {
-				case 0:
-					return '<td class="attainment">' + d.value['private'].attainment + '</td>' +
-						'<td class="gender">' + d.value['private'].gender + '</td>';
-
-				case 1:
-					return '<td>Net Present Value</td><td class="npv">' +
-						dollars(d.value['private']['net present value']) + '</td>';
-
-				case 2:
-					return '<td>Total Costs</td><td class="costs">' +
-						dollars(d.value['private']['total costs']) + '</td>';
-
-				default:
-					return '';
-			}
-		});
-
-		tooltip.appendTo('body');
-		tooltip.offset({
-			left: offset.left + d.x + margin.left - tooltip.outerWidth() * 0.5,
-			top: offset.top + d.y + margin.top - tooltip.outerHeight() - d.radius * 0.6
-		});
-	}
-
-	function hideTooltip(d) {
-		$('#' + d.key).remove();
 	}
 
 	function sortCost(alpha) {
