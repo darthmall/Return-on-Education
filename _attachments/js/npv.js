@@ -140,27 +140,44 @@ function npv(container) {
         country = d.value['private'].country,
         id = d.key.replace(/\s+/g, '_'),
         $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /></div>')
-            .attr('id', id).css('min-width', (_maxR * 8) + 'px').appendTo('body'),
-        svg = d3.select('#' + id).append('svg').attr('height', _maxR * 2);
+            .attr('id', id).appendTo('body'),
+        svg = d3.select('#' + id).append('svg').attr('height', _maxR * 2 + 18);
 
-      svg.selectAll('circle').data(data.filter(function (d) {
+      var filtered = data.filter(function (d) {
         return d.value['private'].country === country;
       }).sort(function (a, b) {
         return b.value['private']['net present value'] - a.value['private']['net present value'];
-      }))
-        .enter().append('circle')
+      });
+
+      var g = svg.selectAll('g').data(filtered)
+        .enter().append('g')
+        .attr('transform', function (d, i) {
+          return 'translate(' + (i * 2 * _maxR) + ',0)';
+        });
+
+      g.append('circle')
         .attr('class', function (d) { return d.key; })
-        .attr('cx', function (d, i) { return _maxR + (i * 2 * _maxR); })
+        .attr('cx', _maxR)
         .attr('cy', function (d) { return 2 * _maxR - d.radius; })
         .attr('r', function (d) { return d.radius; });
+
+      g.append('text')
+        .attr('class', 'label')
+        .attr('x', _maxR)
+        .attr('y', 2 * _maxR + 16)
+        .text(function (d) {
+          var f = d3.format(',.0f');
+          return '$' + f(d.value['private']['net present value']);
+        });
 
       $tooltip.children('h3').text(country);
       $tooltip.children('.flag')
         .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
       $tooltip.css({
-        left: Math.max(0, translate.left + d.x - $tooltip.outerWidth() * 0.5),
-        top: Math.max(0, translate.top + d.y - $tooltip.outerHeight() - d.radius * 0.6)
+        'min-width': filtered.length * 2 * _maxR,
+        'left': Math.max(0, translate.left + d.x - $tooltip.outerWidth() * 0.5),
+        'top': Math.max(0, translate.top + d.y - $tooltip.outerHeight() - d.radius)
       });
     };
   }
