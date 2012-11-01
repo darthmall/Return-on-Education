@@ -1,21 +1,28 @@
 function scatter(container) {
     function chart(data) {
+      data = data.filter(function (d) {
+        return d.value.hasOwnProperty('public') &&
+          d.value.hasOwnProperty('private') &&
+          !isNaN(d.value['private']['total costs']) &&
+          !isNaN(d.value['public']['total costs']);
+      });
+
       _x.domain([0, d3.max(data, function (d) {
-        return Math.abs(d.value['private']);
+        return Math.abs(d.value['private']['total costs']);
       })]);
       _y.domain([0, d3.max(data, function (d) {
-        return Math.abs(d.value['public']);
+        return Math.abs(d.value['public']['total costs']);
       })]);
       _area.domain([0, d3.max(data, function (d) {
-        return Math.abs(d.value['income tax effect']);
+        return Math.abs(d.value['private']['income tax effect']);
       })]);
 
       var xticks = [], yticks = [];
 
       data.forEach(function (d) {
-        var priv = Math.abs(d.value['private']);
-        var pub = Math.abs(d.value['public']);
-        var taxes = Math.abs(d.value['income tax effect']);
+        var priv = Math.abs(d.value['private']['total costs']);
+        var pub = Math.abs(d.value['public']['total costs']);
+        var taxes = Math.abs(d.value['private']['income tax effect']);
 
         d.x = _x(priv);
         d.y = _y(pub);

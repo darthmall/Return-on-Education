@@ -11,6 +11,17 @@ body {
     line-height: 1.4em;
 }
 
+header {
+    position: relative;
+}
+
+header nav {
+    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
 h1, h2, h3, h4, h5 {
     font-family: 'Open Sans' sans-serif;
     font-weight: 800;
@@ -70,18 +81,14 @@ circle:hover {
     position: absolute;
 }
 
-.tooltip .npv,
-.tooltip .costs {
-    padding-left: 1.5em;
-    text-align: right;
-}
-
-.tooltip h4 {
+.tooltip h3 {
     display: inline-block;
 }
 
-.tooltip .gender {
-    float: right;
+.tooltip .flag {
+    float: left;
+    margin-right: 1em;
+    width: 100px;
 }
 
 .axis path,

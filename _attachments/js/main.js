@@ -36,24 +36,20 @@
 
 		if (id === 'cba') {
 			chart = publicScatter;
-			url = '_list/public_v_private/costs?reduce=false';
 		} else if (id === 'multiples') {
 			chart = sorted;
-			url = '_list/public_v_private/npv?reduce=false';
 		} else {
 			chart = bubble;
-			url = '_list/public_v_private/npv?reduce=false';
 		}
 
-		d3.json(url, function (json) {
-			data = json;
-			chart.size([width, height - margin.top - margin.bottom]);
-			chart(data);
-		});
+		chart.size([width, height - margin.top - margin.bottom]);
+		chart(data);
 	});
 
-	d3.json('_list/public_v_private/npv?reduce=false', function (json) {
-		data = json;
+	d3.json('_list/public_v_private/incentives?reduce=false', function (json) {
+		data = json.filter(function (d) {
+			return d.key.search(/average/i) < 0;
+		});
 		chart(data);
 	});
 

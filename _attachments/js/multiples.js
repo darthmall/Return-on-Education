@@ -5,21 +5,25 @@ function multiples(container) {
         h = w + 36,
         cols = Math.floor(_size[0] / w);
 
+      data = data.filter(function (d) {
+        return !isNaN(d.value['private']['net present value']);
+      });
+
       _cacheHeight = $('svg').height();
       $('svg').height(h * Math.ceil(data.length / cols));
 
       _area.domain([0, d3.max(data, function (d) {
-        return d.value['private'];
+        return d.value['private']['net present value'];
       })]);
 
       data = data.sort(function (a, b) {
-        return b.value['private'] - a.value['private'];
+        return b.value['private']['net present value'] - a.value['private']['net present value'];
       });
 
       data.forEach(function (d, i) {
         d.x = maxR + Math.floor(i % cols) * w;
         d.y = maxR + Math.floor(i / cols) * h;
-        d.radius = Math.sqrt(_area(d.value['private']) / Math.PI);
+        d.radius = Math.sqrt(_area(d.value['private']['net present value']) / Math.PI);
       });
 
       var circle = container.selectAll('circle').data(data, function (d) { return d.key; });
@@ -66,7 +70,7 @@ function multiples(container) {
       label.selectAll('.npv')
           .text(function (d) {
             var f = d3.format(',.0f');
-            return '$' + f(d.value['private']);
+            return '$' + f(d.value['private']['net present value']);
           });
 
       label.exit().transition().duration(750)

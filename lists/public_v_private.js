@@ -4,7 +4,7 @@ function(head, req) {
 
   while (row = getRow()) {
     k = row.key.slice(0, -1).join(' '),
-        sector = row.key[3];
+        sector = row.key.slice(-1)[0];
 
     if (!o.hasOwnProperty(k)) {
       o[k] = {};
@@ -14,8 +14,7 @@ function(head, req) {
   }
 
   for (k in o) {
-    if (o.hasOwnProperty(k) && !isNaN(o[k]['private']) &&
-      !isNaN(o[k]['public'])) {
+    if (o.hasOwnProperty(k)) {
       a.push({'key': k, 'value': o[k]});
     }
   }

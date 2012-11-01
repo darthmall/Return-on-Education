@@ -1,6 +1,12 @@
 function npv(container) {
   function chart(data) {
-    _area.domain([0, d3.max(data, function (d) { return d.value['private']; })]);
+    data = data.filter(function (d) {
+      return !isNaN(d.value['private']['net present value']);
+    });
+
+    _area.domain([0, d3.max(data, function (d) {
+      return d.value['private']['net present value'];
+    })]);
 
     // Initialize the x, y, and radii of the circles
     data.forEach(function (d) {
@@ -8,7 +14,7 @@ function npv(container) {
         d.x = Math.random() * 1000;
       }
 
-      d.radius = Math.sqrt(_area([d.value['private']]) / Math.PI);
+      d.radius = Math.sqrt(_area([d.value['private']['net present value']]) / Math.PI);
 
       if (!d.hasOwnProperty('y')) {
         d.y = Math.random() * 1000;
@@ -29,7 +35,7 @@ function npv(container) {
       .attr('cx', function (d) { return d.x; })
       .attr('cy', function (d) { return d.y; });
 
-    circle.on('mouseover', showTooltip)
+    circle.on('mouseover', showTooltip(data))
       .on('mouseout', hideTooltip)
       .transition().duration(750)
       .attr('r', function (d) { return d.radius; });
@@ -119,8 +125,7 @@ function npv(container) {
 
   // Private methods.
   function charge(d) {
-    var c = -Math.pow(d.radius, 2) / 8;
-    return c;
+    return isNaN(d.radius) ? 0 : -Math.pow(d.radius, 2) / 8;
   }
 
   function dollars(x) {
@@ -129,33 +134,39 @@ function npv(container) {
     return '$' + format(x);
   }
 
-  function showTooltip(d) {
-    var translate = $(container[0][0]).offset(),
-      id = d.key.split(' '),
-      $tooltip = $('.tooltip').attr('id', id.join('_'));
+  function showTooltip (data) {
+    return function (d) {
+      var translate = $(container[0][0]).offset(),
+        country = d.value['private'].country,
+        id = d.key.replace(/\s+/g, '_'),
+        $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /></div>')
+            .attr('id', id).css('min-width', (_maxR * 8) + 'px').appendTo('body'),
+        svg = d3.select('#' + id).append('svg').attr('height', _maxR * 2);
 
-    // Clear out any old content.
-    $tooltip.children('.body').children().remove();
+      svg.selectAll('circle').data(data.filter(function (d) {
+        return d.value['private'].country === country;
+      }).sort(function (a, b) {
+        return b.value['private']['net present value'] - a.value['private']['net present value'];
+      }))
+        .enter().append('circle')
+        .attr('class', function (d) { return d.key; })
+        .attr('cx', function (d, i) { return _maxR + (i * 2 * _maxR); })
+        .attr('cy', function (d) { return 2 * _maxR - d.radius; })
+        .attr('r', function (d) { return d.radius; });
 
-    $tooltip.children('h3').text(id[0]);
-    $tooltip.children('.attainment').text(id[1]);
-    $tooltip.children('.gender').text(id[2]);
+      $tooltip.children('h3').text(country);
+      $tooltip.children('.flag')
+        .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
-    $('<table><tr /></table>').appendTo($tooltip.children('.body'));
-
-    $tooltip.find('tr').append(function (index, html) {
-      return '<td>Net Present Value</td><td class="npv">' +
-        dollars(d.value['private']) + '</td>';
-    });
-
-    $tooltip.css({
-      left: translate.left + d.x - $tooltip.outerWidth() * 0.5,
-      top: translate.top + d.y - $tooltip.outerHeight() - d.radius * 0.6
-    }).show();
+      $tooltip.css({
+        left: Math.max(0, translate.left + d.x - $tooltip.outerWidth() * 0.5),
+        top: Math.max(0, translate.top + d.y - $tooltip.outerHeight() - d.radius * 0.6)
+      });
+    };
   }
 
   function hideTooltip(d) {
-    $('#' + d.key.replace(/\s+/g, '_')).hide().remove('.body > *').attr('id', null);
+    $('#' + d.key.replace(/\s+/g, '_')).hide().remove();
   }
 
   function titleTransform(d, i) {
@@ -172,7 +183,8 @@ function npv(container) {
 
   // Private member variables.
   var _force = d3.layout.force().charge(charge).gravity(0),
-    _area = d3.scale.linear().range([0, Math.PI * Math.pow(50, 2)]),
+    _maxR = 50,
+    _area = d3.scale.linear().range([0, Math.PI * Math.pow(_maxR, 2)]),
     _size = [900, 500],
     _gravity = 0.1,
     _forces = null;
