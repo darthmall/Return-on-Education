@@ -19,6 +19,7 @@
 
         <nav class="row-fluid">
             <button id="showNPV" class="navbutton" data-article="npv">Net Present Value</button>
+            <button id="showCountries" class="navbutton" data-article="multiples">By Country</button>
             <button id="showPublicCBA" class="navbutton" data-article="cba">Public Costs</button>
         </nav>
 
@@ -26,25 +27,29 @@
             <div class="span2">
                 <article id="npv">
                     <h2>Net Present Value</h2>
-                    <p>This chart shows the <em>Net Present Value</em> for men and women in 34 different countries that have attained either a <em>Post-Secondary (Non-Tertiary)</em> or <em>Tertiary</em> education.</p>
+                    <p>This chart compares the <em>Net Present Value</em> for men and women with a <em>Post-Secondary (Non-Tertiary)</em> or <em>Tertiary</em> education.</p>
 
                     <h5>Net Present Value</h5>
                     <p>Each circle's area corresponds to the Net Present Value of its demographic. The Net Present Value is the amount of additional money (in U.S. Dollars) someone in that demographic earns over the course of their working life as a result of attaining that level of education after subtracting the cost of that education.</p>
-
-                    <h5>Total Costs</h5>
-                    <p>Include the direct cost of the education, foregone earnings during matriculation, and additional taxes as a result of increased income.</p>
                 </article>
 
                 <article id="cba" style="display:none">
-                    <h2>Public Costs</h2>
-                    <p>Something something public subsidies and private benefits.&hellip;</p>
+                    <h2>Who pays more?</h2>
+                    <p>Comparing the costs to the public and private sectors of obtaining a higher education we can see that the cost to the public sector for <em>Post-Secondary</em> education is often higher than the cost to the private sector. The reverse appears to be true for <em>Tertiary</em> education.</p>
+
+                    <h5>Private Costs</h5>
+                    <p>Include the direct cost to the student (tuition, &amp;c.) as well as the estimated foregone earnings because he or she is not working while attending school. Costs also include additional taxes paid as a result of higher earnings after obtaining the higher education.</p>
+
                     <h5>Public Costs</h5>
-                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis.</p>
+                    <p>Include the direct cost to the public for the education as well as foregone taxes because the student is not working.</p>
+
+                    <h5>Income Tax Effect</h5>
+                    <p>The area of each circle corresponds to the amount of additional taxes an individual pays as a result of higher earnings after obtaining that level of education. One reason that <em>Tertiary</em> education may cost an individual more than it costs the public is that they pay more in taxes than someone with a <em>Post-Secondary</em> education&emdash;so the public recoups the foregone taxes the education cost them once the student returns to the workforce.</p>
                 </article>
 
-                <article id="gender" style="display:none">
-                    <h2>Gender breakdown</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis.</p>
+                <article id="multiples">
+                    <h2>Who has the highest NPV?</h2>
+                    <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
                 </article>
             </div>
 
@@ -64,6 +69,7 @@
         <script src="js/d3.v2.min.js"></script>
         <script src="js/npv.js"></script>
         <script src="js/public_costs.js"></script>
+        <script src="js/multiples.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>

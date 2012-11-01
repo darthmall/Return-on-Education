@@ -27,11 +27,11 @@ function npv(container) {
         return d.key;
       })
       .attr('cx', function (d) { return d.x; })
-      .attr('cy', function (d) { return d.y; })
-      .on('mouseover', showTooltip)
-      .on('mouseout', hideTooltip);
+      .attr('cy', function (d) { return d.y; });
 
-    circle.transition().duration(750)
+    circle.on('mouseover', showTooltip)
+      .on('mouseout', hideTooltip)
+      .transition().duration(750)
       .attr('r', function (d) { return d.radius; });
 
     circle.exit()
@@ -54,6 +54,28 @@ function npv(container) {
         .attr('cy', function (d) { return d.y; });
 
     }).start();
+
+    var titles = container.selectAll('.title')
+      .data(['Tertiary', 'Post-Secondary']);
+
+    titles.transition().duration(750)
+      .attr('x', function (d, i) {
+        return _size[0] * ((i === 0) ? 0.25 : 0.75);
+      });
+    
+    titles.enter().append('text')
+        .attr('class', 'title')
+        .attr('x', function (d, i) { return _size[0] * ((i === 0) ? 0.25 : 0.75); })
+        .attr('y', 18)
+      .transition().duration(750)
+        .style('opacity', 1);
+
+    titles.text(String);
+
+    titles.exit()
+      .transition().duration(750)
+        .style('opacity', 0)
+      .remove();
   }
 
   chart.gravity = function(gravity) {
@@ -87,6 +109,11 @@ function npv(container) {
     container.selectAll('circle')
       .on('mouseover', null)
       .on('mouseout', null);
+
+    container.selectAll('.title')
+      .transition().duration(750)
+        .style('opacity', 0)
+      .remove();
 
     return chart;
   };
@@ -125,11 +152,11 @@ function npv(container) {
     $tooltip.css({
       left: translate.left + d.x - $tooltip.outerWidth() * 0.5,
       top: translate.top + d.y - $tooltip.outerHeight() - d.radius * 0.6
-    }).stop().fadeIn(750);
+    }).show();
   }
 
   function hideTooltip(d) {
-    $('#' + d.key.replace(/\s+/g, '_')).stop().fadeOut(750).remove('.body > *').attr('id', null);
+    $('#' + d.key.replace(/\s+/g, '_')).hide().remove('.body > *').attr('id', null);
   }
 
   // Private member variables.

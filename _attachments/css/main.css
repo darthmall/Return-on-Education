@@ -77,6 +77,10 @@ circle:hover {
     text-anchor: middle;
 }
 
+.label {
+    text-anchor: middle;
+}
+
 .domain {
     display: none;
 }

@@ -13,7 +13,8 @@
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 	var bubble = npv(svg).size([width, height - margin.top - margin.bottom]),
-		publicScatter = scatter(svg).size([width, height - margin.top - margin.bottom]);
+		publicScatter = scatter(svg).size([width, height - margin.top - margin.bottom]),
+		sorted = multiples(svg).size([width, height - margin.top - margin.bottom]);
 
 	var chart = bubble;
 	var data = [];
@@ -36,6 +37,9 @@
 		if (id === 'cba') {
 			chart = publicScatter;
 			url = '_list/public_v_private/costs?reduce=false';
+		} else if (id === 'multiples') {
+			chart = sorted;
+			url = '_list/public_v_private/npv?reduce=false';
 		} else {
 			chart = bubble;
 			url = '_list/public_v_private/npv?reduce=false';
