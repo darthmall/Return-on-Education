@@ -152,12 +152,12 @@ function scatter(container) {
 
       container.selectAll('.x text')
         .classed('hidden', function (t) {
-          return d.value['private'] !== t;
+          return Math.abs(d.value['private']['total costs']) !== t;
         });
 
       container.selectAll('.y text')
         .classed('hidden', function (t) {
-          return d.value['public'] !== t;
+          return Math.abs(d.value['public']['total costs']) !== t;
         });
     }
 
