@@ -6,16 +6,37 @@
 
 body {
     color: #333;
-    font-family: "Helvetica Neue" Helvetia Arial sans-serif;
+    font-family: 'Gentium Book Basic' serif;
     font-size: 0.875em;
     line-height: 1.4em;
 }
 
+h1, h2, h3, h4, h5 {
+    font-family: 'Open Sans' sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-size: 4.43em;
+    line-height: 0.9em;
+}
+
+h2 {
+    font-size: 1.969em;
+    letter-spacing: -0.05em;
+    line-height: 0.9em;
+}
+
 h5 {
     display: run-in;
-    font-size: 1em;
-    font-weight: bold;
-    margin-right: 1em;
+    font-size: 0.875em;
+    letter-spacing: -0.05em;
+    line-height: 1.4em;
+}
+
+h5:after {
+    content: ' ';
 }
 
 label {
@@ -24,10 +45,7 @@ label {
 
 svg {
     display: block;
-}
-
-text {
-    font-size: 12px;
+    font-family: 'Open Sans' sans-serif;
 }
 
 circle {
@@ -37,6 +55,10 @@ circle {
 circle:hover {
     stroke: #333;
     stroke-width: 4;
+}
+
+.hidden {
+    display: none;
 }
 
 .tooltip {
@@ -73,8 +95,17 @@ circle:hover {
     fill: #888;
 }
 
+.axis .title {
+    font-size: 0.875em;
+}
+
 .title {
+    fill: #aaa;
+    font-size: 1.969em;
+    font-weight: 800;
+    line-height: 0.9em;
     text-anchor: middle;
+    text-transform: uppercase;
 }
 
 .label {

@@ -2,7 +2,7 @@ function multiples(container) {
     function chart(data) {
       var maxR = Math.sqrt(_area.range()[1] / Math.PI),
         w = maxR * 2,
-        h = w + 18,
+        h = w + 36,
         cols = Math.floor(_size[0] / w);
 
       _cacheHeight = $('svg').height();
@@ -42,17 +42,32 @@ function multiples(container) {
           .data(data, function (d) { return d.key; });
 
       label.transition().duration(750)
-        .attr('x', function (d) { return d.x; })
-        .attr('y', function (d) { return d.y + d.radius + 16; });
+          .attr('transform', labelTransform(maxR));
 
-      label.enter().append('text')
-        .attr('class', 'label')
-        .attr('x', function (d) { return d.x; })
-        .attr('y', function (d) { return d.y + maxR + 16; })
-        .transition().duration(750)
-        .style('opacity', 1);
+      var labelEnter = label.enter().append('g')
+          .attr('class', 'label')
+          .attr('transform', labelTransform(maxR))
+          .style('opacity', 0);
 
-      label.text(function (d) { return d.key.split(' ').slice(0, -2).join(' '); });
+      labelEnter.transition().duration(750)
+          .style('opacity', 1);
+
+      labelEnter.append('text')
+          .attr('class', 'country')
+          .attr('y', 16);
+
+      labelEnter.append('text')
+          .attr('class', 'npv')
+          .attr('y', 34);
+
+      label.selectAll('.country')
+          .text(function (d) { return d.key.split(' ').slice(0, -2).join(' '); });
+
+      label.selectAll('.npv')
+          .text(function (d) {
+            var f = d3.format(',.0f');
+            return '$' + f(d.value['private']);
+          });
 
       label.exit().transition().duration(750)
         .style('opacity', 0)
@@ -82,6 +97,11 @@ function multiples(container) {
     };
 
     // Private methods
+    function labelTransform(maxR) {
+      return function(d) {
+        return 'translate(' + d.x + ',' + (d.y + maxR) + ')';
+      };
+    }
 
     // Private variables
     var _size = [1, 1],

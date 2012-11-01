@@ -54,22 +54,20 @@ function scatter(container) {
       t.select('.x.axis')
         .attr('transform', 'translate(0,' + _size[1] + ')')
         .style('opacity', 1)
-        .call(_xaxis)
-      .selectAll('text').filter(function (d) {
-        return !d3.select(this).classed('title');
-      })
-        .style('display', function (d, i) {
-          return (d === 0 || d === _x.domain()[1]) ? null : 'none';
+        .call(_xaxis);
+
+      container.selectAll('.x text')
+        .classed('hidden', function (d) {
+          return !(d3.select(this).classed('title')) && d !== _x.domain()[1];
         });
 
       t.select('.y.axis')
         .style('opacity', 1)
-        .call(_yaxis)
-      .selectAll('text').filter(function (d) {
-        return !d3.select(this).classed('title');
-      })
-        .style('display', function (d, i) {
-          return (d === 0 || d === _y.domain()[1]) ? null : 'none';
+        .call(_yaxis);
+
+      container.selectAll('.y text')
+        .classed('hidden', function (d) {
+          return !(d3.select(this).classed('title')) && d !== _y.domain()[1];
         });
 
       var line = container.selectAll('.private_costs')
@@ -100,10 +98,12 @@ function scatter(container) {
       circle.sort(function (a, b) {
         return (b.value['income tax effect'] || 0) - (a.value['income tax effect'] || 0);
       })
+          .on('mouseover', onMouseover)
+          .on('mouseout', onMouseout)
         .transition().duration(750)
-        .attr('cx', function (d) { return d.x; })
-        .attr('cy', function (d) { return d.y; })
-        .attr('r', function (d) { return d.radius; });
+          .attr('cx', function (d) { return d.x; })
+          .attr('cy', function (d) { return d.y; })
+          .attr('r', function (d) { return d.radius; });
 
       circle.exit()
         .transition().duration(750)
@@ -140,6 +140,35 @@ function scatter(container) {
     };
 
     // Private methods
+    function onMouseover(d) {
+      _hover = d;
+
+      container.selectAll('.x text')
+        .classed('hidden', function (t) {
+          return d.value['private'] !== t;
+        });
+
+      container.selectAll('.y text')
+        .classed('hidden', function (t) {
+          return d.value['public'] !== t;
+        });
+    }
+
+    function onMouseout(d) {
+      if (d === _hover) {
+        container.selectAll('.x text')
+          .classed('hidden', function (t) {
+            return !(d3.select(this).classed('title')) && t !== _x.domain()[1];
+          });
+
+        container.selectAll('.y text')
+          .classed('hidden', function (t) {
+            return !(d3.select(this).classed('title')) && t !== _y.domain()[1];
+          });
+
+        _hover = null;
+      }
+    }
 
     // Private variables
     var _nest = d3.nest().key(function (d) { return d.id; })
@@ -161,7 +190,8 @@ function scatter(container) {
       _area = d3.scale.linear().range([25, Math.PI * 30 * 30]),
       _xaxis = d3.svg.axis().orient('bottom'),
       _yaxis = d3.svg.axis().orient('left'),
-      _size = [900, 600];
+      _size = [900, 600],
+      _hover = null;
 
     return chart;
 }

@@ -59,18 +59,17 @@ function npv(container) {
       .data(['Tertiary', 'Post-Secondary']);
 
     titles.transition().duration(750)
-      .attr('x', function (d, i) {
-        return _size[0] * ((i === 0) ? 0.25 : 0.75);
-      });
-    
+        .attr('transform', titleTransform);
+
     titles.enter().append('text')
         .attr('class', 'title')
-        .attr('x', function (d, i) { return _size[0] * ((i === 0) ? 0.25 : 0.75); })
-        .attr('y', 18)
+        .attr('transform', titleTransform)
+        .style('opacity', 0)
       .transition().duration(750)
         .style('opacity', 1);
 
     titles.text(String);
+    
 
     titles.exit()
       .transition().duration(750)
@@ -157,6 +156,18 @@ function npv(container) {
 
   function hideTooltip(d) {
     $('#' + d.key.replace(/\s+/g, '_')).hide().remove('.body > *').attr('id', null);
+  }
+
+  function titleTransform(d, i) {
+    var x = 0,
+      y = _size[1] / 2,
+      theta = -90;
+    if (i > 0) {
+      x = _size[0] - 18;
+      theta = 90;
+    }
+
+    return 'translate(' + x + ',' + y + ') rotate(' + theta + ')';
   }
 
   // Private member variables.
