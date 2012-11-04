@@ -106,7 +106,7 @@
 		$('#benefits').height(height);
 
 		chart.size([width, height - margin.top - margin.bottom]);
-		chart(data);
+		svg.selectAll('.demographic').call(chart);
 	}
 
 	function sortCost(alpha) {

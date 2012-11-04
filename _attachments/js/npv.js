@@ -8,10 +8,14 @@ function bubble() {
         .innerRadius(0).outerRadius(function (d) { return d.radius; });
 
   function chart(g) {
+    var selection = g.filter(function (d) {
+      return !isNaN(d.value['private']['net present value']);
+    });
+
     var nodes = d3.map({}),
         links = [];
 
-      var path = g.selectAll('path')
+      var path = selection.selectAll('path')
           .data(function (d) { return [d]; },
             function (d) { return d.key + ' net present value'; });
 
@@ -22,9 +26,9 @@ function bubble() {
 
       path.exit().remove();
 
-      g.selectAll('.label').remove();
+      selection.selectAll('.label').remove();
 
-      g.data().forEach(function (d) {
+      selection.data().forEach(function (d) {
         nodes.set(d.key, d);
 
         var linkKey = d.key;
@@ -43,7 +47,7 @@ function bubble() {
         }
       });
 
-    g.transition().duration(750)
+    selection.transition().duration(750)
         .attr('transform', function (d) {
           if (!d.x) {
             d.x = Math.random() * 1000;
@@ -68,7 +72,7 @@ function bubble() {
         d.y += (targetY - d.y) * _gravity * e.alpha;
       }
 
-      g.attr('transform', function (d) {
+      selection.attr('transform', function (d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 

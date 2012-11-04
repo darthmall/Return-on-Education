@@ -10,7 +10,12 @@ function scatter() {
     _hover = null;
 
     function chart(g) {
-      var data = g.data();
+      var selection = g.filter(function (d) {
+        return !isNaN(d.value['private']['total costs']) &&
+            !isNaN(d.value['public']['total costs']);
+      });
+
+      var data = selection.data();
 
       _x.domain([0, d3.max(data, function (d) {
         return Math.abs(d.value['private']['total costs']);
@@ -22,7 +27,7 @@ function scatter() {
       _xaxis.scale(_x);
       _yaxis.scale(_y);
 
-      var path = g.selectAll('path').data(function (d) {
+      var path = selection.selectAll('path').data(function (d) {
         return [{
           'key': d.key + ' income tax effect',
           'value': d.value['private']['income tax effect'],
@@ -37,9 +42,9 @@ function scatter() {
 
       path.exit().remove();
 
-      g.selectAll('.label').remove();
+      selection.selectAll('.label').remove();
 
-      g.sort(function (a, b) {
+      selection.sort(function (a, b) {
         return (Math.abs(b.value['private']['income tax effect']) || 0) - (Math.abs(a.value['private']['income tax effect']) || 0);
       })
           .on('mouseover', onMouseover)

@@ -10,7 +10,13 @@ function multiples() {
         .outerRadius(function (d) { return d.data.radius; });
 
     function chart(g) {
-      var data = g.data(),
+      var selection = g.filter(function (d) {
+        return !isNaN(d.value['private']['net present value']) &&
+            d.value['private']['net present value'] > 0 &&
+            !isNaN(d.value['private']['total benefits']);
+      });
+
+      var data = selection.data(),
         maxR = d3.max(data, function (d) { return d.radius; }),
         w =  maxR * 2,
         h = w + 36,
@@ -19,11 +25,11 @@ function multiples() {
       _cacheHeight = $('svg').height();
       $('svg').height(h * Math.ceil(data.length / cols));
 
-      g.sort(function (a, b) {
+      selection.sort(function (a, b) {
         return b.value['private']['net present value'] - a.value['private']['net present value'];
       });
 
-      var path = g.selectAll('path')
+      var path = selection.selectAll('path')
           .data(function (d) {
             var key = d.key,
               r = d.radius,
@@ -49,7 +55,7 @@ function multiples() {
 
       path.exit().remove();
 
-      var label = g.selectAll('.label')
+      var label = selection.selectAll('.label')
           .data(function (d) {
             return [{'country': d.value['private'].country,
               'npv': d.value['private']['net present value']}];
@@ -83,7 +89,7 @@ function multiples() {
         .style('opacity', 0)
         .remove();
 
-      g.transition().duration(750)
+      selection.transition().duration(750)
           .attr('transform', function (d, i) {
             d.x = maxR + Math.floor(i % cols) * w;
             d.y = maxR + Math.floor(i / cols) * h;
