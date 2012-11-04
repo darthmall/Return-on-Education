@@ -1,7 +1,7 @@
 {
 	"env": {
 		"default": {
-			"db": "http://esheehan:bogus123@localhost:5984/education_incentives"
+			"db": "http://esheehan:bogus123@localhost:5984/eag"
 		}
 	}
 }
