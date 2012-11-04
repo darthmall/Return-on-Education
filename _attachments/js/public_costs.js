@@ -22,58 +22,6 @@ function scatter() {
       _xaxis.scale(_x);
       _yaxis.scale(_y);
 
-      // if (container.selectAll('.axis').empty()) {
-      //   container.append('g')
-      //       .attr('class', 'x axis')
-      //       .attr('transform', 'translate(0,' + _size[1] + ')')
-      //     .append('text')
-      //       .attr('class', 'title')
-      //       .attr('transform', 'translate(' + (_size[0]/2) + ',20)')
-      //       .text('Private Costs');
-
-      //   container.append('g').attr('class', 'y axis')
-      //     .append('text')
-      //       .attr('class', 'title')
-      //       .attr('transform', 'translate(-20,' + (_size[1]/2) + ') rotate(-90)')
-      //       .text('Public Costs');
-      // }
-
-      // var t = d3.transition().duration(750);
-
-      // t.select('.x.axis')
-      //   .attr('transform', 'translate(0,' + _size[1] + ')')
-      //   .style('opacity', 1)
-      //   .call(_xaxis);
-
-      // container.selectAll('.x text')
-      //   .classed('hidden', function (d) {
-      //     return !(d3.select(this).classed('title')) && d !== _x.domain()[1];
-      //   });
-
-      // t.select('.y.axis')
-      //   .style('opacity', 1)
-      //   .call(_yaxis);
-
-      // container.selectAll('.y text')
-      //   .classed('hidden', function (d) {
-      //     return !(d3.select(this).classed('title')) && d !== _y.domain()[1];
-      //   });
-
-      // var line = container.selectAll('.private_costs')
-      //     .data([Math.min(_x.domain()[1], _y.domain()[1])]);
-
-      // line.enter().insert('path', ':first-child')
-      //     .attr('class', 'private_costs')
-      //   .transition().duration(750)
-      //     .style('opacity', 1);
-
-      // line.attr('d', function (d) {
-      //   return 'M' + _x(0) + ' ' + _y(0) +
-      //       'L' + _x(d) + ' ' + _y(d) +
-      //       'L' + _size[0] + ' ' + _y(d) +
-      //       'L' + _size[0] + ' ' + _y(0) + 'z';
-      // });
-
       var path = g.selectAll('path').data(function (d) {
         return [{
           'key': d.key + ' income tax effect',
@@ -90,7 +38,7 @@ function scatter() {
       path.exit().remove();
 
       g.selectAll('.label').remove();
-      
+
       g.sort(function (a, b) {
         return (Math.abs(b.value['private']['income tax effect']) || 0) - (Math.abs(a.value['private']['income tax effect']) || 0);
       })
@@ -106,7 +54,37 @@ function scatter() {
     }
 
     // Public methods
-    chart.size = function(dimensions) {
+    chart.axes = function (g) {
+      g.style('opacity', 0).each(function () {
+        d3.selectAll(this.childNodes).remove();
+      });
+
+      g.filter(function () { return d3.select(this).classed('x'); })
+        .attr('transform', 'translate(0,' + _size[1] + ')')
+        .style('opacity', 1)
+        .call(_xaxis);
+
+      var line = g.filter(function () { return d3.select(this).classed('y'); })
+        .attr('transform', null)
+        .call(_yaxis).selectAll('.public-costs')
+          .data([Math.min(_x.domain()[1], _y.domain()[1])]);
+
+      line.enter().append('path')
+          .attr('class', 'private-costs')
+        .transition().duration(750)
+          .style('opacity', 1);
+
+      line.attr('d', function (d) {
+        return 'M' + _x(0) + ' ' + _y(0) +
+            'L' + _x(d) + ' ' + _y(d) +
+            'L' + _size[0] + ' ' + _y(d) +
+            'L' + _size[0] + ' ' + _y(0) + 'z';
+      });
+
+      g.transition().duration(750).style('opacity', 1);
+    };
+
+    chart.size = function (dimensions) {
         if (arguments.length < 1) {
             return _size;
         }
@@ -119,7 +97,7 @@ function scatter() {
         return chart;
     };
 
-    chart.stop = function() {
+    chart.stop = function () {
       // container.selectAll('.private_costs')
       //   .transition().duration(750)
       //     .style('opacity', 0)

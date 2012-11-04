@@ -94,6 +94,15 @@ function multiples() {
     }
 
     // Public methods
+    chart.axes = function (g) {
+      g.each(function () {
+        d3.selectAll(this.childNodes)
+            .transition().duration(750)
+            .style('opacity', 0)
+            .remove();
+      });
+    };
+
     chart.size = function(size) {
         if (arguments.length < 1) {
             return _size;

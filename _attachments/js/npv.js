@@ -23,7 +23,7 @@ function bubble() {
       path.exit().remove();
 
       g.selectAll('.label').remove();
-      
+
       g.data().forEach(function (d) {
         nodes.set(d.key, d);
 
@@ -76,25 +76,26 @@ function bubble() {
   }
 
   chart.axes = function (g) {
-    var titles = g.selectAll('.title')
-      .data(['Tertiary', 'Post-Secondary']);
+    g.each(function (d) {
+      var that = d3.select(this);
 
-    titles.transition().duration(750)
-        .attr('transform', titleTransform);
+      d3.selectAll(this.childNodes).remove();
 
-    titles.enter().append('text')
-        .attr('class', 'title')
-        .attr('transform', titleTransform)
-        .style('opacity', 0)
-      .transition().duration(750)
-        .style('opacity', 1);
+      that.attr('transform', function() {
+        if (that.classed('x')) {
+          return 'translate(0,' + (_size[1]/2) + ')rotate(-90)';
+        }
 
-    titles.text(String);
-    
-    titles.exit()
-      .transition().duration(750)
-        .style('opacity', 0)
-      .remove();
+        return 'translate(' + _size[0] + ',' + (_size[1]/2) + ')rotate(90)';
+      }).append('text')
+          .attr('class', 'title')
+          .attr('dy', function () {
+            return that.classed('x') ? d3.select(this).style('font-size') : null;
+          })
+          .text(function () {
+            return that.classed('x') ? 'Tertiary' : 'Post-Secondary';
+          });
+    });
   };
 
   chart.gravity = function(gravity) {

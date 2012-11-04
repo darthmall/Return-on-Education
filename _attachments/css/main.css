@@ -119,8 +119,9 @@ circle:hover {
     display: none;
 }
 
-.private_costs {
+.axis .private-costs {
     fill: #eee;
+    stroke: none;
 }
 
 .male.post-secondary .income-tax-effect,
@@ -149,6 +150,9 @@ circle:hover {
 
 .demographic path {
     fill: #EEE;
-    stroke: #888;
     opacity: 0.9;
+}
+
+.multiples .income-tax-effect {
+    opacity: 0.7;
 }

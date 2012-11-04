@@ -8,8 +8,7 @@
 	$('#benefits').height(height);
 
 	// Groups for the different charts
-	var svg = d3.select('#benefits')
-		.append('g')
+	var svg = d3.select('#benefits .content')
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 	var maxR = 50,
@@ -68,7 +67,9 @@
 		}
 
 		chart.size([width, height - margin.top - margin.bottom]);
-		svg.selectAll('.demographic').call(chart);
+		svg.attr('class', 'content ' + id)
+				.selectAll('.demographic').call(chart);
+		svg.selectAll('.axis').call(chart.axes);
 	});
 
 	d3.json('_list/public_v_private/incentives?reduce=false', function (json) {
@@ -94,6 +95,8 @@
 				});
 
 		demographic.call(chart);
+
+		d3.selectAll('.axis').call(chart.axes);
 	});
 
 	function invalidateSize() {
