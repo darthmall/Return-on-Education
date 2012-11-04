@@ -2,12 +2,22 @@
 
 import couchdb
 import csv
+import locale
 
 
 def parse(filename):
     def convert(v):
+        if type(v) != str:
+            return v
+
+        v = v.strip()
+        locale.setlocale(locale.LC_NUMERIC, 'en_US')
+
         try:
-            return float(v)
+            if v.endswith('%'):
+                return locale.atof(v[:-1]) / 100.0
+
+            return locale.atof(v)
         except ValueError:
             return v
 
@@ -17,7 +27,7 @@ def parse(filename):
             for k, v in row.iteritems():
                 row[k] = convert(v)
 
-            yield dict([(k.lower(), convert(v)) for k, v in row.iteritems()])
+            yield dict([(k.strip().lower(), convert(v)) for k, v in row.iteritems()])
 
 
 def main(args):
