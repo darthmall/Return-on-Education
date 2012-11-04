@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="css/colorbrewer.css">
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,600|Gentium+Book+Basic:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="css/chosen.css">
         <link rel="stylesheet" href="css/main.css">
 
         <script src="js/vendor/modernizr-2.6.1.min.js"></script>
@@ -50,15 +51,53 @@
                     <p>The area of each circle corresponds to the amount of additional taxes an individual pays as a result of higher earnings after obtaining that level of education. One reason that <em>Tertiary</em> education may cost an individual more than it costs the public is that they pay more in taxes than someone with a <em>Post-Secondary</em> education&emdash;so the public recoups the foregone taxes the education cost them once the student returns to the workforce.</p>
                 </article>
 
-                <article id="benefits">
+                <article id="benefits" style="display:none">
                     <h2>Who has the highest NPV?</h2>
                     <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
                 </article>
             </div>
 
             <div class="span10 last">
+                <select name="filter" class="filter country chzn-select span3"
+                multiple data-placeholder="Show countries...">
+                    <option>Australia</option>
+                    <option>Austria</option>
+                    <option>Belgium</option>
+                    <option>Canada</option>
+                    <option>Chile</option>
+                    <option>Czech Republic</option>
+                    <option>Denmark</option>
+                    <option>Estonia</option>
+                    <option>Finland</option>
+                    <option>France</option>
+                    <option>Germany</option>
+                    <option>Greece</option>
+                    <option>Hungary</option>
+                    <option>Iceland</option>
+                    <option>Ireland</option>
+                    <option>Israel</option>
+                    <option>Italy</option>
+                    <option>Japan</option>
+                    <option>Korea</option>
+                    <option>Luxembourg</option>
+                    <option>Mexico</option>
+                    <option>Netherlands</option>
+                    <option>New Zealand</option>
+                    <option>Norway</option>
+                    <option>Poland</option>
+                    <option>Portugal</option>
+                    <option>Slovak Republic</option>
+                    <option>Slovenia</option>
+                    <option>Spain</option>
+                    <option>Sweden</option>
+                    <option>Switzerland</option>
+                    <option>Turkey</option>
+                    <option>United Kingdom</option>
+                    <option>United States</option>
+                    <option>OECD average</option>
+                </select>
                 <svg>
-                    <g class="content">
+                    <g class="content npv">
                         <g class="x axis"></g>
                         <g class="y axis"></g>
                         <g class="data"></g>
@@ -68,6 +107,7 @@
         </div>
 
         <script src="js/vendor/jquery-1.8.2.min.js"></script>
+        <script src="js/vendor/chosen.jquery.min.js"></script>
         <script src="js/d3.v2.min.js"></script>
         <script src="js/npv.js"></script>
         <script src="js/public_costs.js"></script>

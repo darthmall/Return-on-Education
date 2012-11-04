@@ -5,10 +5,17 @@ function bubble() {
     _size = [900, 500],
     _gravity = 0.1,
     _arc = d3.svg.arc().startAngle(0).endAngle(2 * Math.PI)
-        .innerRadius(0).outerRadius(function (d) { return d.radius; });
+        .innerRadius(0).outerRadius(function (d) { return d.radius; }),
+    _hover = null;
 
   function chart(g) {
-    var selection = g.filter(isValid);
+    var selection = g.filter(isValid),
+      countries = selection.filter(function (d) {
+        return d.value['private'].type === 'country';
+      }),
+      average = selection.filter(function (d) {
+        return d.value['private'].type === 'average';
+      });
 
     var nodes = d3.map({}),
         links = [];
@@ -25,13 +32,15 @@ function bubble() {
     path.enter().append('path');
 
     path.attr('d', _arc)
-        .attr('class', 'net-present-value');
+        .attr('class', 'net-present-value')
+        .on('mouseover', onMouseover)
+        .on('mouseout', onMouseout);
 
     path.exit().remove();
 
     selection.selectAll('.label').remove();
 
-    selection.data().forEach(function (d) {
+    countries.data().forEach(function (d) {
       nodes.set(d.key, d);
 
       var linkKey = d.key;
@@ -50,7 +59,7 @@ function bubble() {
       }
     });
 
-    selection.transition().duration(750)
+    countries.transition().duration(750)
         .attr('transform', function (d) {
           if (!d.x) {
             d.x = Math.random() * 1000;
@@ -64,6 +73,20 @@ function bubble() {
         })
         .style('opacity', 1);
 
+    average.transition().duration(750)
+        .attr('transform', function (d) {
+          d.x = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.3 : 0.6);
+          d.y = 50;
+
+          if (d.key.indexOf('female') >= 0) {
+            d.x += d.radius + 5;
+          } else {
+            d.x -= d.radius + 5;
+          }
+
+          return 'translate(' + d.x + ',' + d.y + ')';
+        });
+
     _force.nodes(nodes.values()).links(links).on('tick', function (e) {
       var targetY = _size[1] * 0.5,
         nodeList = nodes.values();
@@ -76,7 +99,7 @@ function bubble() {
         d.y += (targetY - d.y) * _gravity * e.alpha;
       }
 
-      selection.attr('transform', function (d) {
+      countries.attr('transform', function (d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
@@ -202,11 +225,28 @@ function bubble() {
   }
 
   function isValid(d) {
-    return !isNaN(d.value['private']['net present value']);
+    return !d3.select(this).classed('hidden') &&
+      d.value['private'].country !== 'EU21 Average' &&
+      !isNaN(d.value['private']['net present value']);
   }
 
   function isInvalid(d) {
-    return !isValid(d);
+    return !isValid.call(this, d);
+  }
+
+  function onMouseover(d) {
+    _hover = d;
+    d3.selectAll('.demographic').classed('unfocused', function (d) {
+      return d.value['private'].type !== 'average' &&
+        d.value['private'].country !== _hover.value['private'].country;
+    });
+  }
+
+  function onMouseout(d) {
+    if (d === _hover) {
+      _hover = null;
+      d3.selectAll('.demographic').classed('unfocused', false);
+    }
   }
 
   function titleTransform(d, i) {

@@ -2,6 +2,8 @@ function multiples() {
   // Private variables
   var _size = [1, 1],
     _cacheHeight = 0,
+    _colWidth = 50,
+    _padding = 5,
     _pie = d3.layout.pie().sort(function (a, b) {
           var order = ['net-present-value', 'direct-cost', 'foregone-earnings',
               'income-tax-effect', 'social-contribution', 'transfers-effect'];
@@ -18,13 +20,12 @@ function multiples() {
       var selection = g.filter(isValid);
 
       var data = selection.data(),
-          maxR = d3.max(data, function (d) { return d.radius; }),
-          w =  maxR * 2,
+          w =  _colWidth + _padding * 2,
           h = w + 36,
           cols = Math.floor(_size[0] / w);
 
       _cacheHeight = $('svg').height();
-      $('svg').height(h * Math.ceil(data.length / cols));
+      $('svg').height(h * Math.ceil(data.length / cols) + (_colWidth / 2));
 
       g.filter(isInvalid)
         .transition().duration(750)
@@ -70,7 +71,7 @@ function multiples() {
 
       var labelEnter = label.enter().append('g')
           .attr('class', 'label')
-          .attr('transform', 'translate(0,' + maxR + ')')
+          .attr('transform', 'translate(0,' + (_colWidth / 2) + ')')
           .style('opacity', 0);
 
       labelEnter.transition().duration(750)
@@ -98,8 +99,8 @@ function multiples() {
 
       selection.transition().duration(750)
           .attr('transform', function (d, i) {
-            d.x = maxR + Math.floor(i % cols) * w;
-            d.y = maxR + Math.floor(i / cols) * h;
+            d.x = _padding + (_colWidth / 2) + Math.floor(i % cols) * w;
+            d.y = _padding + (_colWidth / 2) + Math.floor(i / cols) * h;
 
             return 'translate(' + d.x + ',' + d.y + ')';
           })
@@ -117,9 +118,18 @@ function multiples() {
       });
     };
 
+    chart.colWidth = function(colWidth) {
+        if (arguments.length < 1) {
+            return _colWidth;
+        }
+    
+        _colWidth = colWidth;
+    
+        return chart;
+    };
     chart.size = function(size) {
         if (arguments.length < 1) {
-            return _size;
+          return _size;
         }
     
         _size = size;
@@ -135,13 +145,14 @@ function multiples() {
 
     // Private methods
     function isValid(d) {
-      return !isNaN(d.value['private']['net present value']) &&
+      return !d3.select(this).classed('hidden') &&
+          !isNaN(d.value['private']['net present value']) &&
           d.value['private']['net present value'] > 0 &&
           !isNaN(d.value['private']['total benefits']);
     }
 
     function isInvalid(d) {
-      return !isValid(d);
+      return !isValid.call(this, d);
     }
 
     return chart;

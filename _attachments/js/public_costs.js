@@ -120,12 +120,13 @@ function scatter() {
 
     // Private methods
     function isValid(d) {
-      return !isNaN(d.value['private']['total costs']) &&
+      return !d3.select(this).classed('hidden') &&
+          !isNaN(d.value['private']['total costs']) &&
           !isNaN(d.value['public']['total costs']);
     }
 
     function isInvalid(d) {
-      return !isValid(d);
+      return !isValid.call(this, d);
     }
 
     function onMouseover(d) {

@@ -16,12 +16,14 @@
 
 	var npv = bubble().size([width, height - margin.top - margin.bottom]),
 			publicScatter = scatter().size([width, height - margin.top - margin.bottom]),
-			sorted = multiples().size([width, height - margin.top - margin.bottom]);
+			sorted = multiples().size([width, height - margin.top - margin.bottom])
+					.colWidth(maxR * 2);
 
 	var chart = npv;
 	var data = [];
 
 	$(window).resize(invalidateSize);
+	$('.chzn-select').change(updateFilter).chosen();
 
 	$('.navbutton').click(function (e) {
 		var id = e.target.getAttribute('data-article'),
@@ -121,5 +123,17 @@
 		var format = d3.format(',.0f');
 
 		return '$' + format(x);
+	}
+
+	function updateFilter(e, o) {
+		var selected = $(this).val();
+
+		if (!selected) {
+			d3.selectAll('.demographic').classed('hidden', false).call(chart);
+		} else {
+			d3.selectAll('.demographic').classed('hidden', function (d) {
+				return (selected.indexOf(d.value['private'].country) < 0);
+			}).call(chart);
+		}
 	}
 })(jQuery);

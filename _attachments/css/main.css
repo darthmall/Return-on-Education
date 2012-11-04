@@ -124,6 +124,18 @@ circle:hover {
     stroke: none;
 }
 
+.demographic {
+    transition: opacity 500ms ease-in-out;
+    -webkit-transition: opacity 500ms ease-in-out;
+    -moz-transition: opacity 500ms ease-in-out;
+    -o-transition: opacity 500ms ease-in-out;
+    -ms-transition: opacity 500ms ease-in-out;
+}
+
+.unfocused {
+    opacity: 0.2;
+}
+
 .costs .male.post-secondary .income-tax-effect,
 .male.post-secondary .net-present-value {
     fill: #53A5B6;
@@ -157,6 +169,7 @@ circle:hover {
     fill: #67666A;
 }
 
+.npv .demographic.average.male path,
 .benefits .income-tax-effect {
     fill: #807F83;
 }
@@ -165,6 +178,7 @@ circle:hover {
     fill: #8C8B90;
 }
 
+.npv .demographic.average.female path,
 .benefits .transfers-effect {
     fill: #CAC8D0;
 }
