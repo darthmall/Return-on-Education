@@ -59,10 +59,6 @@ svg {
     font-family: 'Open Sans' sans-serif;
 }
 
-circle {
-    opacity: 0.8;
-}
-
 circle:hover {
     stroke: #333;
     stroke-width: 4;
@@ -127,18 +123,32 @@ circle:hover {
     fill: #eee;
 }
 
+.male.post-secondary .income-tax-effect,
+.male.post-secondary .net-present-value,
 .male.post-secondary {
     fill: #53A5B6;
 }
 
+.male.tertiary .income-tax-effect,
+.male.tertiary .net-present-value,
 .male.tertiary {
     fill: #0A527E;
 }
 
+.female.post-secondary .income-tax-effect,
+.female.post-secondary .net-present-value,
 .female.post-secondary {
     fill: #E7BDC6;
 }
 
+.female.tertiary .income-tax-effect,
+.female.tertiary .net-present-value,
 .female.tertiary {
     fill: #CB7C97;
+}
+
+.demographic path {
+    fill: #EEE;
+    stroke: #888;
+    opacity: 0.9;
 }

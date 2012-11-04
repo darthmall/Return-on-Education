@@ -1,56 +1,61 @@
-function multiples(container) {
-    function chart(data) {
-      var maxR = Math.sqrt(_area.range()[1] / Math.PI),
-        w = maxR * 2,
+function multiples() {
+  // Private variables
+  var _size = [1, 1],
+    _cacheHeight = 0,
+    _pie = d3.layout.pie().sort(null)
+        .value(function (d) {
+          return d.value;
+        }),
+    _arc = d3.svg.arc().innerRadius(0)
+        .outerRadius(function (d) { return d.data.radius; });
+
+    function chart(g) {
+      var data = g.data(),
+        maxR = d3.max(data, function (d) { return d.radius; }),
+        w =  maxR * 2,
         h = w + 36,
         cols = Math.floor(_size[0] / w);
-
-      data = data.filter(function (d) {
-        return !isNaN(d.value['private']['net present value']);
-      });
 
       _cacheHeight = $('svg').height();
       $('svg').height(h * Math.ceil(data.length / cols));
 
-      _area.domain([0, d3.max(data, function (d) {
-        return d.value['private']['net present value'];
-      })]);
-
-      data = data.sort(function (a, b) {
+      g.sort(function (a, b) {
         return b.value['private']['net present value'] - a.value['private']['net present value'];
       });
 
-      data.forEach(function (d, i) {
-        d.x = maxR + Math.floor(i % cols) * w;
-        d.y = maxR + Math.floor(i / cols) * h;
-        d.radius = Math.sqrt(_area(d.value['private']['net present value']) / Math.PI);
-      });
+      var path = g.selectAll('path')
+          .data(function (d) {
+            var key = d.key,
+              r = d.radius,
+              entries = d3.entries(d.value['private'])
+                .filter(function (d) {
+                  return (d.key === 'net present value' || d.value < 0) && !isNaN(d.value);
+                });
 
-      var circle = container.selectAll('circle').data(data, function (d) { return d.key; });
+              entries.forEach(function (d) {
+                d.className = d.key.replace(/\s+/g, '-');
+                d.key = key + ' ' + d.key;
+                d.radius = r;
+                d.value = Math.abs(d.value);
+              });
 
-      circle.enter().append('circle')
-        .attr('class', function (d) { return d.key; })
-        .attr('cx', function (d) { return d.x; })
-        .attr('cy', function (d) { return d.y; });
+              return _pie(entries);
+            });
 
-      circle.transition().duration(750)
-        .attr('cx', function (d) { return d.x; })
-        .attr('cy', function (d) { return d.y; })
-        .attr('r', function (d) { return d.radius; });
+      path.enter().append('path');
+        
+      path.attr('class', function (d) { return d.data.className; })
+          .attr('d', function (d) { return _arc(d); });
 
-      circle.exit().transition().duration(750)
-        .attr('r', 0)
-        .remove();
-
-      var label = container.selectAll('.label')
-          .data(data, function (d) { return d.key; });
-
-      label.transition().duration(750)
-          .attr('transform', labelTransform(maxR));
+      var label = g.selectAll('.label')
+          .data(function (d) {
+            return [{'country': d.value['private'].country,
+              'npv': d.value['private']['net present value']}];
+          });
 
       var labelEnter = label.enter().append('g')
           .attr('class', 'label')
-          .attr('transform', labelTransform(maxR))
+          .attr('transform', 'translate(0,' + maxR + ')')
           .style('opacity', 0);
 
       labelEnter.transition().duration(750)
@@ -64,18 +69,26 @@ function multiples(container) {
           .attr('class', 'npv')
           .attr('y', 34);
 
-      label.selectAll('.country')
-          .text(function (d) { return d.key.split(' ').slice(0, -2).join(' '); });
+      label.selectAll('.country').text(function (d) { return d.country; });
 
       label.selectAll('.npv')
           .text(function (d) {
             var f = d3.format(',.0f');
-            return '$' + f(d.value['private']['net present value']);
+            return '$' + f(d.npv);
           });
 
       label.exit().transition().duration(750)
         .style('opacity', 0)
         .remove();
+
+      g.transition().duration(750)
+          .attr('transform', function (d, i) {
+            d.x = maxR + Math.floor(i % cols) * w;
+            d.y = maxR + Math.floor(i / cols) * h;
+
+            return 'translate(' + d.x + ',' + d.y + ')';
+          });
+
     }
 
     // Public methods
@@ -90,27 +103,12 @@ function multiples(container) {
     };
 
     chart.stop = function() {
-      container.selectAll('.label')
-        .transition().duration(750)
-        .style('opacity', 0)
-        .remove();
-
       $('svg').height(_cacheHeight);
 
       return chart;
     };
 
     // Private methods
-    function labelTransform(maxR) {
-      return function(d) {
-        return 'translate(' + d.x + ',' + (d.y + maxR) + ')';
-      };
-    }
-
-    // Private variables
-    var _size = [1, 1],
-      _area = d3.scale.linear().range([5, Math.PI * 50 * 50]),
-      _cacheHeight = 0;
 
     return chart;
 }
