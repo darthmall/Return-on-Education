@@ -2,13 +2,13 @@
 	// Set up the dimensions
 	var margin = { top: 30, right: 30, bottom: 30, left: 100 },
 		padding = {top: 5, right: 5, bottom: 15, left: 5},
-		width = benefits.clientWidth - margin.left - margin.right,
-		height = $(window).height() - $('#benefits').offset().top;
+		width = $('svg').width() - margin.left - margin.right,
+		height = $(window).height() - $('svg').offset().top;
 
-	$('#benefits').height(height);
+	$('svg').height(height);
 
 	// Groups for the different charts
-	var svg = d3.select('#benefits .content')
+	var svg = d3.select('svg .content')
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 	var maxR = 50,
@@ -36,7 +36,7 @@
 
 		var url = '';
 
-		if (id === 'cba') {
+		if (id === 'costs') {
 			data.forEach(function (d) {
 				function r(a) { return Math.sqrt(a / Math.PI); }
 
@@ -46,7 +46,7 @@
 			});
 
 			chart = publicScatter;
-		} else if (id === 'multiples') {
+		} else if (id === 'benefits') {
 			data.forEach(function (d) {
 				function r(a) { return Math.sqrt(a / Math.PI); }
 

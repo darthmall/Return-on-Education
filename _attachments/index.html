@@ -21,8 +21,8 @@
 
             <nav class="row-fluid">
                 <button id="showNPV" class="navbutton" data-article="npv">Net Present Value</button>
-                <button id="showCountries" class="navbutton" data-article="multiples">By Country</button>
-                <button id="showPublicCBA" class="navbutton" data-article="cba">Public Costs</button>
+                <button id="showCountries" class="navbutton" data-article="benefits">Total Benefits</button>
+                <button id="showPublicCBA" class="navbutton" data-article="costs">Public vs. Private Costs</button>
             </nav>
         </header>
 
@@ -36,7 +36,7 @@
                     <p>Each circle's area corresponds to the Net Present Value of its demographic. The Net Present Value is the amount of additional money (in U.S. Dollars) someone in that demographic earns over the course of their working life as a result of attaining that level of education after subtracting the cost of that education.</p>
                 </article>
 
-                <article id="cba" style="display:none">
+                <article id="costs" style="display:none">
                     <h2>Who pays more?</h2>
                     <p>Comparing the costs to the public and private sectors of obtaining a higher education we can see that the cost to the public sector for <em>Post-Secondary</em> education is often higher than the cost to the private sector. The reverse appears to be true for <em>Tertiary</em> education.</p>
 
@@ -50,14 +50,14 @@
                     <p>The area of each circle corresponds to the amount of additional taxes an individual pays as a result of higher earnings after obtaining that level of education. One reason that <em>Tertiary</em> education may cost an individual more than it costs the public is that they pay more in taxes than someone with a <em>Post-Secondary</em> education&emdash;so the public recoups the foregone taxes the education cost them once the student returns to the workforce.</p>
                 </article>
 
-                <article id="multiples">
+                <article id="benefits">
                     <h2>Who has the highest NPV?</h2>
                     <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
                 </article>
             </div>
 
             <div class="span10 last">
-                <svg id="benefits">
+                <svg>
                     <g class="content">
                         <g class="x axis"></g>
                         <g class="y axis"></g>
