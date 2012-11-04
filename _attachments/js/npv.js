@@ -25,6 +25,8 @@ function bubble() {
 
         path.attr('d', _arc);
 
+        path.exit().remove();
+
         nodes.set(d.key, d);
 
         var linkKey = d.key;
@@ -34,7 +36,7 @@ function bubble() {
         } else {
           linkKey.replace('male', 'female');
         }
-        
+
         if (nodes.has(linkKey)) {
           links.push({
             'source': d,

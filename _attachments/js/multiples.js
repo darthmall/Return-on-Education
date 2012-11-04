@@ -47,6 +47,8 @@ function multiples() {
       path.attr('class', function (d) { return d.data.className; })
           .attr('d', function (d) { return _arc(d); });
 
+      path.exit().remove();
+
       var label = g.selectAll('.label')
           .data(function (d) {
             return [{'country': d.value['private'].country,
