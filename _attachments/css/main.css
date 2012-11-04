@@ -124,27 +124,23 @@ circle:hover {
     stroke: none;
 }
 
-.male.post-secondary .income-tax-effect,
-.male.post-secondary .net-present-value,
-.male.post-secondary {
+.costs .male.post-secondary .income-tax-effect,
+.male.post-secondary .net-present-value {
     fill: #53A5B6;
 }
 
-.male.tertiary .income-tax-effect,
-.male.tertiary .net-present-value,
-.male.tertiary {
+.costs .male.tertiary .income-tax-effect,
+.male.tertiary .net-present-value {
     fill: #0A527E;
 }
 
-.female.post-secondary .income-tax-effect,
-.female.post-secondary .net-present-value,
-.female.post-secondary {
+.costs .female.post-secondary .income-tax-effect,
+.female.post-secondary .net-present-value {
     fill: #E7BDC6;
 }
 
-.female.tertiary .income-tax-effect,
-.female.tertiary .net-present-value,
-.female.tertiary {
+.costs .female.tertiary .income-tax-effect,
+.female.tertiary .net-present-value {
     fill: #CB7C97;
 }
 
@@ -153,6 +149,22 @@ circle:hover {
     opacity: 0.9;
 }
 
-.multiples .income-tax-effect {
-    opacity: 0.7;
+.benefits .direct-cost {
+    fill: #424143;
+}
+
+.benefits .foregone-earnings {
+    fill: #67666A;
+}
+
+.benefits .income-tax-effect {
+    fill: #807F83;
+}
+
+.benefits .social-contribution {
+    fill: #8C8B90;
+}
+
+.benefits .transfers-effect {
+    fill: #CAC8D0;
 }

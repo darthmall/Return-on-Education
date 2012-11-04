@@ -10,10 +10,7 @@ function scatter() {
     _hover = null;
 
     function chart(g) {
-      var selection = g.filter(function (d) {
-        return !isNaN(d.value['private']['total costs']) &&
-            !isNaN(d.value['public']['total costs']);
-      });
+      var selection = g.filter(isValid);
 
       var data = selection.data();
 
@@ -26,6 +23,10 @@ function scatter() {
 
       _xaxis.scale(_x);
       _yaxis.scale(_y);
+
+      g.filter(isInvalid)
+        .transition().duration(750)
+          .style('opacity', 0);
 
       var path = selection.selectAll('path').data(function (d) {
         return [{
@@ -55,7 +56,8 @@ function scatter() {
             d.y = _y(Math.abs(d.value['public']['total costs']));
 
             return 'translate(' + d.x + ',' + d.y + ')';
-          });
+          })
+          .style('opacity', 1);
     }
 
     // Public methods
@@ -117,6 +119,15 @@ function scatter() {
     };
 
     // Private methods
+    function isValid(d) {
+      return !isNaN(d.value['private']['total costs']) &&
+          !isNaN(d.value['public']['total costs']);
+    }
+
+    function isInvalid(d) {
+      return !isValid(d);
+    }
+
     function onMouseover(d) {
       _hover = d;
 

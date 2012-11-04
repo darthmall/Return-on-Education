@@ -8,44 +8,47 @@ function bubble() {
         .innerRadius(0).outerRadius(function (d) { return d.radius; });
 
   function chart(g) {
-    var selection = g.filter(function (d) {
-      return !isNaN(d.value['private']['net present value']);
-    });
+    var selection = g.filter(isValid);
 
     var nodes = d3.map({}),
         links = [];
 
-      var path = selection.selectAll('path')
-          .data(function (d) { return [d]; },
-            function (d) { return d.key + ' net present value'; });
+    // Fade out all invalid entries
+    g.filter(isInvalid)
+      .transition().duration(750)
+        .style('opacity', 0);
 
-      path.enter().append('path');
+    var path = selection.selectAll('path')
+        .data(function (d) { return [d]; },
+          function (d) { return d.key + ' net present value'; });
 
-      path.attr('d', _arc)
-          .attr('class', 'net-present-value');
+    path.enter().append('path');
 
-      path.exit().remove();
+    path.attr('d', _arc)
+        .attr('class', 'net-present-value');
 
-      selection.selectAll('.label').remove();
+    path.exit().remove();
 
-      selection.data().forEach(function (d) {
-        nodes.set(d.key, d);
+    selection.selectAll('.label').remove();
 
-        var linkKey = d.key;
+    selection.data().forEach(function (d) {
+      nodes.set(d.key, d);
 
-        if (linkKey.indexOf('female') >= 0) {
-          linkKey.replace('female', 'male');
-        } else {
-          linkKey.replace('male', 'female');
-        }
+      var linkKey = d.key;
 
-        if (nodes.has(linkKey)) {
-          links.push({
-            'source': d,
-            'target': nodes.get(linkKey)
-          });
-        }
-      });
+      if (linkKey.indexOf('female') >= 0) {
+        linkKey.replace('female', 'male');
+      } else {
+        linkKey.replace('male', 'female');
+      }
+
+      if (nodes.has(linkKey)) {
+        links.push({
+          'source': d,
+          'target': nodes.get(linkKey)
+        });
+      }
+    });
 
     selection.transition().duration(750)
         .attr('transform', function (d) {
@@ -58,7 +61,8 @@ function bubble() {
           }
 
           return 'translate(' + d.x + ',' + d.y + ')';
-        });
+        })
+        .style('opacity', 1);
 
     _force.nodes(nodes.values()).links(links).on('tick', function (e) {
       var targetY = _size[1] * 0.5,
@@ -195,6 +199,14 @@ function bubble() {
 
   function hideTooltip(d) {
     $('#' + d.key.replace(/\s+/g, '_')).hide().remove();
+  }
+
+  function isValid(d) {
+    return !isNaN(d.value['private']['net present value']);
+  }
+
+  function isInvalid(d) {
+    return !isValid(d);
   }
 
   function titleTransform(d, i) {

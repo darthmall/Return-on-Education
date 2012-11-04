@@ -2,7 +2,12 @@ function multiples() {
   // Private variables
   var _size = [1, 1],
     _cacheHeight = 0,
-    _pie = d3.layout.pie().sort(null)
+    _pie = d3.layout.pie().sort(function (a, b) {
+          var order = ['net-present-value', 'direct-cost', 'foregone-earnings',
+              'income-tax-effect', 'social-contribution', 'transfers-effect'];
+
+          return order.indexOf(a.className) - order.indexOf(b.className);
+        })
         .value(function (d) {
           return d.value;
         }),
@@ -10,20 +15,20 @@ function multiples() {
         .outerRadius(function (d) { return d.data.radius; });
 
     function chart(g) {
-      var selection = g.filter(function (d) {
-        return !isNaN(d.value['private']['net present value']) &&
-            d.value['private']['net present value'] > 0 &&
-            !isNaN(d.value['private']['total benefits']);
-      });
+      var selection = g.filter(isValid);
 
       var data = selection.data(),
-        maxR = d3.max(data, function (d) { return d.radius; }),
-        w =  maxR * 2,
-        h = w + 36,
-        cols = Math.floor(_size[0] / w);
+          maxR = d3.max(data, function (d) { return d.radius; }),
+          w =  maxR * 2,
+          h = w + 36,
+          cols = Math.floor(_size[0] / w);
 
       _cacheHeight = $('svg').height();
       $('svg').height(h * Math.ceil(data.length / cols));
+
+      g.filter(isInvalid)
+        .transition().duration(750)
+          .style('opacity', 0);
 
       selection.sort(function (a, b) {
         return b.value['private']['net present value'] - a.value['private']['net present value'];
@@ -35,7 +40,9 @@ function multiples() {
               r = d.radius,
               entries = d3.entries(d.value['private'])
                 .filter(function (d) {
-                  return (d.key === 'net present value' || d.value < 0) && !isNaN(d.value);
+                  return (d.key === 'net present value' || d.value < 0) &&
+                      !isNaN(d.value) &&
+                      d.key !== 'total costs';
                 });
 
               entries.forEach(function (d) {
@@ -95,7 +102,8 @@ function multiples() {
             d.y = maxR + Math.floor(i / cols) * h;
 
             return 'translate(' + d.x + ',' + d.y + ')';
-          });
+          })
+          .style('opacity', 1);
 
     }
 
@@ -126,6 +134,15 @@ function multiples() {
     };
 
     // Private methods
+    function isValid(d) {
+      return !isNaN(d.value['private']['net present value']) &&
+          d.value['private']['net present value'] > 0 &&
+          !isNaN(d.value['private']['total benefits']);
+    }
+
+    function isInvalid(d) {
+      return !isValid(d);
+    }
 
     return chart;
 }
