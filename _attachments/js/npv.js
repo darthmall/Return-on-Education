@@ -4,29 +4,27 @@ function bubble() {
       .linkDistance(function (l) { return l.source.radius + l.target.radius; }),
     _size = [900, 500],
     _gravity = 0.1,
-    _arc = d3.svg.arc()
-        .innerRadius(0).startAngle(0).endAngle(2 * Math.PI);
+    _arc = d3.svg.arc().startAngle(0).endAngle(2 * Math.PI)
+        .innerRadius(0).outerRadius(function (d) { return d.radius; });
 
   function chart(g) {
     var nodes = d3.map({}),
         links = [];
 
-    g.each(function (d, i) {
-      _arc.outerRadius(d.radius);
+      var path = g.selectAll('path')
+          .data(function (d) { return [d]; },
+            function (d) { return d.key + ' net present value'; });
 
-      if (!isNaN(d.value['private']['net present value'])) {
-        var path = d3.select(this).selectAll('path')
-            .data([d], function (d) { return d.key + ' net present value'; });
+      path.enter().append('path');
 
-        path.enter().append('path')
-            .attr('class', 'net-present-value')
-            .on('mouseover', showTooltip(d))
-            .on('mouseout', hideTooltip);
+      path.attr('d', _arc)
+          .attr('class', 'net-present-value');
 
-        path.attr('d', _arc);
+      path.exit().remove();
 
-        path.exit().remove();
-
+      g.selectAll('.label').remove();
+      
+      g.data().forEach(function (d) {
         nodes.set(d.key, d);
 
         var linkKey = d.key;
@@ -43,8 +41,7 @@ function bubble() {
             'target': nodes.get(linkKey)
           });
         }
-      }
-    });
+      });
 
     g.transition().duration(750)
         .attr('transform', function (d) {

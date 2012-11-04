@@ -89,6 +89,8 @@ function scatter() {
 
       path.exit().remove();
 
+      g.selectAll('.label').remove();
+      
       g.sort(function (a, b) {
         return (Math.abs(b.value['private']['income tax effect']) || 0) - (Math.abs(a.value['private']['income tax effect']) || 0);
       })
