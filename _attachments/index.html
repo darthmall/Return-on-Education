@@ -5,105 +5,111 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Financial Incentives for Higher Education</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="css/colorbrewer.css">
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,600|Gentium+Book+Basic:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,600,300|Gentium+Book+Basic:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/chosen.css">
         <link rel="stylesheet" href="css/main.css">
 
         <script src="js/vendor/modernizr-2.6.1.min.js"></script>
     </head>
     <body>
+        <header class="container-fluid">
+            <div class="row-fluid">
+                <h1 class="span5">
+                    <span class="small">Financial Returns</span><br />
+                    <i>on</i> Education
+                </h1>
 
-        <header>
-            <h1 class="row-fluid">Financial Returns <i>of</i> Education</h1>
-
-            <nav class="row-fluid">
-                <a href="#npv">Net Present Value</a>
-                <a href="#benefits">Total Benefits</a>
-                <a href="#costs">Public vs. Private Costs</a>
-            </nav>
+                <nav class="span7">
+                    <a href="#npv">Net Present Value</a>
+                    <a href="#benefits">Total Benefits</a>
+                    <a href="#costs">Public vs. Private Costs</a>
+                </nav>
+            </div>
         </header>
 
-        <div class="row-fluid">
-            <div class="span2">
-                <article id="npv">
-                    <h2>Net Present Value</h2>
-                    <p>This chart compares the <em>Net Present Value</em> for men and women with a <em>Post-Secondary (Non-Tertiary)</em> or <em>Tertiary</em> education.</p>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3">
+                    <article id="npv">
+                        <h2>Net Present Value</h2>
+                        <p>This chart compares the <em>Net Present Value</em> for men and women with a <em>Post-Secondary (Non-Tertiary)</em> or <em>Tertiary</em> education.</p>
 
-                    <h5>Net Present Value</h5>
-                    <p>Each circle's area corresponds to the Net Present Value of its demographic. The Net Present Value is the amount of additional money (in U.S. Dollars) someone in that demographic earns over the course of their working life as a result of attaining that level of education after subtracting the cost of that education.</p>
-                </article>
+                        <h5>Net Present Value</h5>
+                        <p>Each circle's area corresponds to the Net Present Value of its demographic. The Net Present Value is the amount of additional money (in U.S. Dollars) someone in that demographic earns over the course of their working life as a result of attaining that level of education after subtracting the cost of that education.</p>
+                    </article>
 
-                <article id="costs" style="display:none">
-                    <h2>Who pays more?</h2>
-                    <p>Comparing the costs to the public and private sectors of obtaining a higher education we can see that the cost to the public sector for <em>Post-Secondary</em> education is often higher than the cost to the private sector. The reverse appears to be true for <em>Tertiary</em> education.</p>
+                    <article id="costs" style="display:none">
+                        <h2>Who pays more?</h2>
+                        <p>Comparing the costs to the public and private sectors of obtaining a higher education we can see that the cost to the public sector for <em>Post-Secondary</em> education is often higher than the cost to the private sector. The reverse appears to be true for <em>Tertiary</em> education.</p>
 
-                    <h5>Private Costs</h5>
-                    <p>Include the direct cost to the student (tuition, &amp;c.) as well as the estimated foregone earnings because he or she is not working while attending school. Costs also include additional taxes paid as a result of higher earnings after obtaining the higher education.</p>
+                        <h5>Private Costs</h5>
+                        <p>Include the direct cost to the student (tuition, &amp;c.) as well as the estimated foregone earnings because he or she is not working while attending school. Costs also include additional taxes paid as a result of higher earnings after obtaining the higher education.</p>
 
-                    <h5>Public Costs</h5>
-                    <p>Include the direct cost to the public for the education as well as foregone taxes because the student is not working.</p>
+                        <h5>Public Costs</h5>
+                        <p>Include the direct cost to the public for the education as well as foregone taxes because the student is not working.</p>
 
-                    <h5>Income Tax Effect</h5>
-                    <p>The area of each circle corresponds to the amount of additional taxes an individual pays as a result of higher earnings after obtaining that level of education. One reason that <em>Tertiary</em> education may cost an individual more than it costs the public is that they pay more in taxes than someone with a <em>Post-Secondary</em> education&emdash;so the public recoups the foregone taxes the education cost them once the student returns to the workforce.</p>
-                </article>
+                        <h5>Income Tax Effect</h5>
+                        <p>The area of each circle corresponds to the amount of additional taxes an individual pays as a result of higher earnings after obtaining that level of education. One reason that <em>Tertiary</em> education may cost an individual more than it costs the public is that they pay more in taxes than someone with a <em>Post-Secondary</em> education&emdash;so the public recoups the foregone taxes the education cost them once the student returns to the workforce.</p>
+                    </article>
 
-                <article id="benefits" style="display:none">
-                    <h2>Who has the highest NPV?</h2>
-                    <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
-                </article>
-            </div>
+                    <article id="benefits" style="display:none">
+                        <h2>Who has the highest NPV?</h2>
+                        <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
+                    </article>
+                </div>
 
-            <div class="span10 last">
-                <select name="filter" class="filter country chzn-select span3"
-                multiple data-placeholder="Show countries...">
-                    <option>Australia</option>
-                    <option>Austria</option>
-                    <option>Belgium</option>
-                    <option>Canada</option>
-                    <option>Chile</option>
-                    <option>Czech Republic</option>
-                    <option>Denmark</option>
-                    <option>Estonia</option>
-                    <option>Finland</option>
-                    <option>France</option>
-                    <option>Germany</option>
-                    <option>Greece</option>
-                    <option>Hungary</option>
-                    <option>Iceland</option>
-                    <option>Ireland</option>
-                    <option>Israel</option>
-                    <option>Italy</option>
-                    <option>Japan</option>
-                    <option>Korea</option>
-                    <option>Luxembourg</option>
-                    <option>Mexico</option>
-                    <option>Netherlands</option>
-                    <option>New Zealand</option>
-                    <option>Norway</option>
-                    <option>Poland</option>
-                    <option>Portugal</option>
-                    <option>Slovak Republic</option>
-                    <option>Slovenia</option>
-                    <option>Spain</option>
-                    <option>Sweden</option>
-                    <option>Switzerland</option>
-                    <option>Turkey</option>
-                    <option>United Kingdom</option>
-                    <option>United States</option>
-                    <option>OECD average</option>
-                    <option>EU21 average</option>
-                </select>
-                <svg>
-                    <g class="content npv">
-                        <g class="x axis"></g>
-                        <g class="y axis"></g>
-                        <g class="data"></g>
-                    </g>
-                </svg>
+                <div class="span9">
+                    <select name="filter" class="filter country chzn-select span3"
+                    multiple data-placeholder="Show countries...">
+                        <option>Australia</option>
+                        <option>Austria</option>
+                        <option>Belgium</option>
+                        <option>Canada</option>
+                        <option>Chile</option>
+                        <option>Czech Republic</option>
+                        <option>Denmark</option>
+                        <option>Estonia</option>
+                        <option>Finland</option>
+                        <option>France</option>
+                        <option>Germany</option>
+                        <option>Greece</option>
+                        <option>Hungary</option>
+                        <option>Iceland</option>
+                        <option>Ireland</option>
+                        <option>Israel</option>
+                        <option>Italy</option>
+                        <option>Japan</option>
+                        <option>Korea</option>
+                        <option>Luxembourg</option>
+                        <option>Mexico</option>
+                        <option>Netherlands</option>
+                        <option>New Zealand</option>
+                        <option>Norway</option>
+                        <option>Poland</option>
+                        <option>Portugal</option>
+                        <option>Slovak Republic</option>
+                        <option>Slovenia</option>
+                        <option>Spain</option>
+                        <option>Sweden</option>
+                        <option>Switzerland</option>
+                        <option>Turkey</option>
+                        <option>United Kingdom</option>
+                        <option>United States</option>
+                        <option>OECD average</option>
+                        <option>EU21 average</option>
+                    </select>
+                    <svg>
+                        <g class="content npv">
+                            <g class="x axis"></g>
+                            <g class="y axis"></g>
+                            <g class="data"></g>
+                        </g>
+                    </svg>
+                </div>
             </div>
         </div>
 

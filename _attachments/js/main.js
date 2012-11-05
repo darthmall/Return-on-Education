@@ -1,6 +1,6 @@
 (function($) {
 	// Set up the dimensions
-	var margin = { top: 50, right: 30, bottom: 30, left: 100 },
+	var margin = { top: 100, right: 18, bottom: 10, left: 18 },
 		padding = {top: 5, right: 5, bottom: 15, left: 5},
 		width = $('svg').width() - margin.left - margin.right,
 		height = $(window).height() - $('svg').offset().top;
@@ -103,10 +103,10 @@
 	});
 
 	function invalidateSize() {
-		var width = benefits.clientWidth - margin.left - margin.right,
-			height = $(window).height() - $('#benefits').offset().top;
+		var width = $('svg').width() - margin.left - margin.right,
+			height = $(window).height() - $('svg').offset().top;
 
-		$('#benefits').height(height);
+		$('svg').height(height);
 
 		chart.size([width, height - margin.top - margin.bottom]);
 		svg.selectAll('.demographic').call(chart);

@@ -4,6 +4,8 @@ function bubble() {
       .linkDistance(function (l) { return l.source.radius + l.target.radius; }),
     _size = [900, 500],
     _gravity = 0.1,
+    _padding = 5,
+    _colWidth = 100,
     _arc = d3.svg.arc().startAngle(0).endAngle(2 * Math.PI)
         .innerRadius(0).outerRadius(function (d) { return d.radius; }),
     _hover = null;
@@ -32,7 +34,8 @@ function bubble() {
     path.enter().append('path');
 
     path.attr('d', _arc)
-        .attr('class', 'net-present-value')
+        .attr('class', 'net-present-value');
+    countries.selectAll('path')
         .on('mouseover', onMouseover)
         .on('mouseout', onMouseout);
 
@@ -75,15 +78,46 @@ function bubble() {
 
     average.transition().duration(750)
         .attr('transform', function (d) {
-          d.x = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.3 : 0.6);
 
-          if (d.key.indexOf('female') >= 0) {
-            d.x += d.radius + 5;
-          } else {
-            d.x -= d.radius + 5;
+          switch(d.key) {
+          case 'OECD average tertiary male':
+            d.x = _size[0] * 0.25 - _colWidth * 1.5;
+            break;
+
+          case 'OECD average tertiary female':
+            d.x = _size[0] * 0.25 - _colWidth * 0.5;
+            break;
+
+          case 'EU21 average tertiary male':
+            d.x = _size[0] * 0.25 + _colWidth * 0.5;
+            break;
+
+          case 'EU21 average tertiary female':
+            d.x = _size[0] * 0.25 + _colWidth * 1.5;
+            break;
+
+          case 'OECD average post-secondary male':
+            d.x = _size[0] * 0.75 - _colWidth * 1.5;
+            break;
+
+          case 'OECD average post-secondary female':
+            d.x = _size[0] * 0.75 - _colWidth * 0.5;
+            break;
+
+          case 'EU21 average post-secondary male':
+            d.x = _size[0] * 0.75 + _colWidth * 0.5;
+            break;
+
+          case 'EU21 average post-secondary female':
+            d.x = _size[0] * 0.75 + _colWidth * 1.5;
+            break;
+
+          default:
+            d.x = 0;
+            break;
           }
 
-          return 'translate(' + d.x + ',0)';
+          return 'translate(' + d.x + ',' + (-_colWidth / 2) + ')';
         });
 
     average.selectAll('.label').data(function (d) {
@@ -91,9 +125,8 @@ function bubble() {
       })
       .enter().append('text')
         .attr('class', 'label')
-        .attr('dy', function (d, i) {
+        .attr('y', function (d, i) {
           var s = Number(d3.select(this).style('font-size').slice(0, -2));
-          console.log(s);
           return (i === 0 ? -s / 2 : s / 2);
         })
         .text(function (d) { return d; });
@@ -104,7 +137,7 @@ function bubble() {
 
       for (var i = 0; i < nodeList.length; i++) {
         var d = nodeList[i],
-          targetX = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.3 : 0.6);
+          targetX = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.25 : 0.75);
 
         d.x += (targetX - d.x) * _gravity * e.alpha;
         d.y += (targetY - d.y) * _gravity * e.alpha;
@@ -138,6 +171,16 @@ function bubble() {
             return that.classed('x') ? 'Tertiary' : 'Post-Secondary';
           });
     });
+  };
+
+  chart.colWidth = function(colWidth) {
+      if (arguments.length < 1) {
+          return _colWidth;
+      }
+  
+      _colWidth = colWidth;
+  
+      return chart;
   };
 
   chart.gravity = function(gravity) {

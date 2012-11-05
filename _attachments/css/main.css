@@ -12,7 +12,21 @@ body {
 }
 
 header {
+    box-shadow: 0 2px 4px #ccc;
+    margin-bottom: 2.8em;
     position: relative;
+}
+
+header h1 .small {
+    font-size: 0.583em;
+    letter-spacing: 0.056em;
+    line-height: 0.8em;
+}
+
+header i {
+    font-family: 'Gentium Book Basic' serif;
+    font-size: 0.389em;
+    text-transform: lowercase;
 }
 
 header nav {
@@ -25,6 +39,7 @@ header nav {
 h1, h2, h3, h4, h5 {
     font-family: 'Open Sans' sans-serif;
     font-weight: 800;
+    margin-top: 0;
     text-transform: uppercase;
 }
 
@@ -50,12 +65,6 @@ h5:after {
     content: ' ';
 }
 
-header i {
-    display: block;
-    font-family: 'Gentium Book Basic' serif;
-    font-size: 0.389em;
-    text-transform: lowercase;
-}
 
 nav a,
 nav a:visited {
@@ -193,6 +202,6 @@ circle:hover {
 .npv .demographic.average path {
     fill: #ddd;
     stroke: #888;
-    stroke-width: 2;
+    stroke-width: 1;
     stroke-dasharray: 4, 3;
 }
