@@ -25,3 +25,6 @@
 
 ## Footer
 - Cite data source
+
+## Add-ons
+- Map to select countries/regions
