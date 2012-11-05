@@ -16,10 +16,10 @@ function scatter() {
 
       _x.domain([0, d3.max(data, function (d) {
         return Math.abs(d.value['private']['total costs']);
-      })]);
+      }) * 1.05]);
       _y.domain([0, d3.max(data, function (d) {
         return Math.abs(d.value['public']['total costs']);
-      })]);
+      }) * 1.05]);
 
       _xaxis.scale(_x);
       _yaxis.scale(_y);
@@ -66,7 +66,25 @@ function scatter() {
     // Public methods
     chart.axes = function (g) {
       g.style('opacity', 0).each(function () {
+        var axis = d3.select(this),
+          fs = 18;
+
         d3.selectAll(this.childNodes).remove();
+
+        var text = axis.append('text')
+            .attr('class', 'title');
+
+        fs = text.style('font-size').slice(0, -2);
+
+
+        if (axis.classed('x')) {
+          text.attr('transform', 'translate(' + (_size[0] / 2) + ',40)')
+              .text('Private Costs');
+        } else {
+          text.attr('dy', fs)
+              .attr('transform', 'translate(-90,' + (_size[1] / 2) + ')rotate(-90)')
+              .text('Public Costs');
+        }
       });
 
       g.filter(function () { return d3.select(this).classed('x'); })

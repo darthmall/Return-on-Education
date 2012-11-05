@@ -217,6 +217,7 @@ function bubble() {
 
   chart.stop = function() {
     // Stop the force layout
+    _hover = null;
     _force.nodes([])
         .links([])
         .stop();

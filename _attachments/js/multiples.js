@@ -30,7 +30,7 @@ function multiples() {
           .style('opacity', 0);
 
       // Clear out any old text
-      g.selectAll('text').remove();
+      g.selectAll('text.title, text.label').remove();
 
       selection.sort(function (a, b) {
         return b.value['private']['net present value'] - a.value['private']['net present value'];
@@ -78,17 +78,18 @@ function multiples() {
           .style('opacity', 1);
 
       labelEnter.append('text')
-          .attr('class', 'country')
-          .attr('y', 16);
+          .attr('class', 'country');
 
       labelEnter.append('text')
-          .attr('class', 'npv')
-          .attr('y', 34);
+          .attr('class', 'npv');
 
       label.attr('transform', 'translate(0,' + (_colWidth / 2) + ')')
-          .selectAll('.country').text(function (d) { return d.country; });
+          .selectAll('.country')
+          .attr('y', 16)
+          .text(function (d) { return d.country; });
 
       label.selectAll('.npv')
+          .attr('y', 34)
           .text(function (d) {
             var f = d3.format(',.0f');
             return '$' + f(d.npv);
