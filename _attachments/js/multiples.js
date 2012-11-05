@@ -29,6 +29,9 @@ function multiples() {
         .transition().duration(750)
           .style('opacity', 0);
 
+      // Clear out any old text
+      g.selectAll('text').remove();
+
       selection.sort(function (a, b) {
         return b.value['private']['net present value'] - a.value['private']['net present value'];
       });
@@ -69,7 +72,6 @@ function multiples() {
 
       var labelEnter = label.enter().append('g')
           .attr('class', 'label')
-          .attr('transform', 'translate(0,' + (_colWidth / 2) + ')')
           .style('opacity', 0);
 
       labelEnter.transition().duration(750)
@@ -83,7 +85,8 @@ function multiples() {
           .attr('class', 'npv')
           .attr('y', 34);
 
-      label.selectAll('.country').text(function (d) { return d.country; });
+      label.attr('transform', 'translate(0,' + (_colWidth / 2) + ')')
+          .selectAll('.country').text(function (d) { return d.country; });
 
       label.selectAll('.npv')
           .text(function (d) {
@@ -103,7 +106,6 @@ function multiples() {
             return 'translate(' + d.x + ',' + d.y + ')';
           })
           .style('opacity', 1);
-
     }
 
     // Public methods

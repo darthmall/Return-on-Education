@@ -24,6 +24,9 @@ function scatter() {
       _xaxis.scale(_x);
       _yaxis.scale(_y);
 
+      // Clear out old text
+      g.selectAll('text').remove();
+
       g.filter(isInvalid)
         .transition().duration(750)
           .style('opacity', 0);

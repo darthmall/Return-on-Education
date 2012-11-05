@@ -1,7 +1,6 @@
 # TODO
 
 ## Bugs
-- Labels & titles applied to the averages in the bubble chart are never property removed
 
 ## Charts
 - Legends
