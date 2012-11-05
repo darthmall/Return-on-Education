@@ -34,10 +34,10 @@
 
 		$('#' + id).css('display', 'block');
 
-		chart.stop();
-
 		var url = '';
 
+		chart.stop();
+		
 		if (id === 'costs') {
 			data.forEach(function (d) {
 				function r(a) { return Math.sqrt(a / Math.PI); }
@@ -68,6 +68,7 @@
 			chart = npv;
 		}
 
+		$('svg').height(height);
 		chart.size([width, height - margin.top - margin.bottom]);
 		svg.attr('class', 'content ' + id)
 				.selectAll('.demographic').call(chart);

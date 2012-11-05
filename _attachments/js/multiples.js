@@ -1,7 +1,6 @@
 function multiples() {
   // Private variables
   var _size = [1, 1],
-    _cacheHeight = 0,
     _colWidth = 50,
     _padding = 5,
     _pie = d3.layout.pie().sort(function (a, b) {
@@ -24,7 +23,6 @@ function multiples() {
           h = w + 36,
           cols = Math.floor(_size[0] / w);
 
-      _cacheHeight = $('svg').height();
       $('svg').height(h * Math.ceil(data.length / cols) + (_colWidth / 2));
 
       g.filter(isInvalid)
@@ -138,8 +136,6 @@ function multiples() {
     };
 
     chart.stop = function() {
-      $('svg').height(_cacheHeight);
-
       return chart;
     };
 

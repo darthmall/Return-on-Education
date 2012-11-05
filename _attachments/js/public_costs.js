@@ -12,7 +12,7 @@ function scatter() {
     function chart(g) {
       var selection = g.filter(isValid);
 
-      var data = selection.data();
+      var data = g.data();
 
       _x.domain([0, d3.max(data, function (d) {
         return Math.abs(d.value['private']['total costs']);
@@ -105,16 +105,6 @@ function scatter() {
     };
 
     chart.stop = function () {
-      // container.selectAll('.private_costs')
-      //   .transition().duration(750)
-      //     .style('opacity', 0)
-      //   .remove();
-
-      // container.selectAll('.axis')
-      //   .transition().duration(750)
-      //     .style('opacity', 0)
-      //   .remove();
-
       return chart;
     };
 
