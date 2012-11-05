@@ -1,28 +1,31 @@
 (function($) {
 	// Set up the dimensions
-	var margin = { top: 100, right: 18, bottom: 10, left: 18 },
-		width = $('svg').width() - margin.left - margin.right,
+	var width = $('svg').width(),
 		height = $(window).height() - $('svg').offset().top;
 
 	$('svg').height(height);
 
 	// Groups for the different charts
-	var svg = d3.select('svg .content')
-			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+	var svg = d3.select('svg .content');
 
 	var maxR = 50,
 			area = d3.scale.linear().range([0, Math.PI * maxR * maxR]);
 
-	var npv = bubble().size([width, height - margin.top - margin.bottom]),
-			publicScatter = scatter().size([width, height - margin.top - margin.bottom]),
-			sorted = multiples().size([width, height - margin.top - margin.bottom])
-					.colWidth(maxR * 2);
+	var npv = bubble(),
+			publicScatter = scatter(),
+			sorted = multiples().colWidth(maxR * 2);
 
 	var chart = npv;
 	var data = [];
 
+	npv.margin = { top: 100, right: 18, bottom: 10, left: 18 };
+	sorted.margin = { top: 5, right: 5, bottom: 5, left: 5 };
+	publicScatter.margin = { top: 5, right: 5, bottom: 50, left: 100 };
+
 	$(window).resize(invalidateSize);
 	$('.chzn-select').change(updateFilter).chosen();
+
+	invalidateSize();
 
 	$('nav a').click(function (e) {
 		var id = e.target.getAttribute('href'),
@@ -67,11 +70,10 @@
 			chart = npv;
 		}
 
-		$('svg').height(height);
-		chart.size([width, height - margin.top - margin.bottom]);
-		svg.attr('class', 'content ' + id.slice(1))
-				.selectAll('.demographic').call(chart);
-		svg.selectAll('.axis').call(chart.axes);
+		$('svg').attr('class', id.slice(1));
+		invalidateSize();
+
+		return false;
 	});
 
 	d3.json('_list/public_v_private/incentives?reduce=false', function (json) {
@@ -102,13 +104,20 @@
 	});
 
 	function invalidateSize() {
-		var width = $('svg').width() - margin.left - margin.right,
-			height = $(window).height() - $('svg').offset().top;
+		var $svg = $('svg'),
+			width = $svg.width() - chart.margin.left - chart.margin.right,
+			height = $(window).height() - $svg.offset().top;
 
-		$('svg').height(height);
+		$svg.height(height);
 
-		chart.size([width, height - margin.top - margin.bottom]);
+		height -= chart.margin.top + chart.margin.bottom;
+
+		svg.attr('transform',
+			'translate(' + chart.margin.left + ',' + chart.margin.top + ')');
+
+		chart.size([width, height]);
 		svg.selectAll('.demographic').call(chart);
+		svg.selectAll('.axis').call(chart.axes);
 	}
 
 	function sortCost(alpha) {

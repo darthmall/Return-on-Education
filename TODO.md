@@ -2,15 +2,16 @@
 
 ## Bugs
 - Labels & titles applied to the averages in the bubble chart are never property removed
-- Bottom row of titles in pie charts is clipped off
 
 ## Charts
 - Legends
-- Custom margins per layout
 - Callouts for significant data points
 	- Highest/lowest
 	- Average
 - Tooltips
+- Link directly to charts with local links in URL
+- Axes titles missing on scatter plot
+- Add padding to domain and range on scatter plot
 
 ## Copy
 - Explanation of each chart & terms
@@ -20,6 +21,7 @@
 - Navigation links
 - Header
 - Footer
+- Transitions for explanatory text
 
 ## Footer
 - Cite data source
