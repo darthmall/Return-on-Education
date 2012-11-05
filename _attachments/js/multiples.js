@@ -107,6 +107,12 @@ function multiples() {
             return 'translate(' + d.x + ',' + d.y + ')';
           })
           .style('opacity', 1);
+
+      selection.append('circle')
+          .attr('class', 'hover-target')
+          .attr('r', function (d) { return d.radius; })
+          .on('mouseover.multiples', onMouseover)
+          .on('mouseout.multiples', onMouseout);
     }
 
     // Public methods
@@ -139,6 +145,8 @@ function multiples() {
     };
 
     chart.stop = function() {
+      d3.selectAll('.demographic .hover-target').remove();
+
       return chart;
     };
 
@@ -152,6 +160,49 @@ function multiples() {
 
     function isInvalid(d) {
       return !isValid.call(this, d);
+    }
+
+    function onMouseover(d) {
+      var translate = $(this).offset(),
+        country = d.value['private'].country,
+        id = d.key.replace(/\s+/g, '_'),
+        $tip = $('<div class="tooltip"><h3></h3><img class="flag" />' +
+          '<table><tr><td>Total Benefits</td><td class="total-benefits" /></tr>' +
+          '<tr><td>Income Tax Effect</td><td class="income-tax-effect" /></tr>' +
+          '<tr><td>Direct Cost</td><td class="direct-cost" /></tr>' +
+          '<tr><td>Foregone Earnings</td><td class="foregone-earnings" /></tr>' +
+          '<tr><td>Social Contribution Effect</td><td class="social-contribution" /></tr>' +
+          '<tr><td>Transfers Effect</td><td class="transfers-effect" /></tr>' +
+          '<tr><th>Net Present Value</th><th class="net-present-value" /></tr>' +
+          '</table></div>')
+            .attr('id', id).appendTo('body');
+
+        $tip.children('h3').text(country);
+        $tip.children('.flag')
+            .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
+
+        $tip.find('.total-benefits').text(d.value['private']['total benefits']);
+        $tip.find('.income-tax-effect').text(d.value['private']['income tax effect']);
+        $tip.find('.direct-cost').text(d.value['private']['direct cost']);
+        $tip.find('.foregone-earnings').text(d.value['private']['foregone earnings']);
+        $tip.find('.social-contribution').text(d.value['private']['social contribution']);
+        $tip.find('.transfers-effect').text(d.value['private']['transfers effect']);
+        $tip.find('.net-present-value').text(d.value['private']['net present value']);
+
+        $tip.css({
+          'left': Math.max(0, translate.left + d.radius - $tip.width() * 0.5),
+          'top': Math.max(0, translate.top - $tip.height() - d.radius)
+        });
+
+        _hover = d;
+    }
+
+    function onMouseout(d) {
+      $('#' + d.key.replace(/\s+/g, '_')).hide().remove();
+
+      if (d === _hover) {
+        _hover = null;
+      }
     }
 
     return chart;

@@ -36,8 +36,8 @@ function bubble() {
     path.attr('d', _arc)
         .attr('class', 'net-present-value');
     countries.selectAll('path')
-        .on('mouseover', showTooltip)
-        .on('mouseout', hideTooltip);
+        .on('mouseover.bubble', showTooltip)
+        .on('mouseout.bubble', hideTooltip);
 
     path.exit().remove();
 
@@ -216,8 +216,13 @@ function bubble() {
   };
 
   chart.stop = function() {
-    // Stop the force layout
     _hover = null;
+
+    d3.selectAll('.demographic path')
+        .on('mouseover.bubble', null)
+        .on('mouseout.bubble', null);
+    
+    // Stop the force layout
     _force.nodes([])
         .links([])
         .stop();

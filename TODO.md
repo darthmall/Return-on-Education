@@ -4,6 +4,7 @@
 
 ## Charts
 - Highlight OECD/EU countries when hovering over averages in the bubble chart
+- Tooltips are fugly
 - Callouts for significant data points
 	- Highest/lowest
 	- Average

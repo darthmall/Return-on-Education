@@ -80,9 +80,10 @@ svg {
     font-family: 'Open Sans' sans-serif;
 }
 
-circle:hover {
-    stroke: #333;
-    stroke-width: 4;
+.hover-target {
+    fill: white;
+    stroke: none;
+    opacity: 0;
 }
 
 .hidden {
@@ -178,20 +179,25 @@ circle:hover {
     opacity: 0.9;
 }
 
-.benefits .direct-cost {
+.benefits .income-tax-effect {
+
     fill: #424143;
 }
 
-.benefits .foregone-earnings {
+.benefits .direct-cost {
     fill: #67666A;
 }
 
-.benefits .social-contribution {
+.benefits .foregone-earnings {
     fill: #8C8B90;
 }
 
-.benefits .transfers-effect {
+.benefits .social-contribution {
     fill: #CAC8D0;
+}
+
+.benefits .transfers-effect {
+    fill: #eee;
 }
 
 .npv .demographic.average path {
@@ -226,18 +232,22 @@ circle:hover {
     background-color: #CB7C97;
 }
 
-.legend .direct-cost.swatch {
+.legend .income-tax-effect.swatch {
     background-color: #424143;
 }
 
-.legend .foregone-earnings.swatch {
+.legend .direct-cost.swatch {
     background-color: #67666A;
 }
 
-.legend .social-contribution.swatch {
+.legend .foregone-earnings.swatch {
     background-color: #8C8B90;
 }
 
-.legend .transfers-effect.swatch {
+.legend .social-contribution.swatch {
     background-color: #CAC8D0;
+}
+
+.legend .transfers-effect.swatch {
+    background-color: #eee;
 }
