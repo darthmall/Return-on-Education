@@ -36,8 +36,8 @@ function bubble() {
     path.attr('d', _arc)
         .attr('class', 'net-present-value');
     countries.selectAll('path')
-        .on('mouseover', onMouseover)
-        .on('mouseout', onMouseout);
+        .on('mouseover', showTooltip)
+        .on('mouseout', hideTooltip);
 
     path.exit().remove();
 
@@ -235,56 +235,67 @@ function bubble() {
     return '$' + format(x);
   }
 
-  function showTooltip (data) {
-    return function (d) {
-      var translate = $(container[0][0]).offset(),
-        country = d.value['private'].country,
-        id = d.key.replace(/\s+/g, '_'),
-        $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /></div>')
-            .attr('id', id).appendTo('body'),
-        svg = d3.select('#' + id).append('svg').attr('height', _maxR * 2 + 18);
+  function showTooltip (d) {
+    var translate = $(this).offset(),
+      country = d.value['private'].country,
+      id = d.key.replace(/\s+/g, '_'),
+      $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /></div>')
+          .attr('id', id).appendTo('body'),
+      svg = d3.select('#' + id).append('svg')
+          .attr('height', _colWidth + 18);
 
-      var filtered = data.filter(function (d) {
-        return d.value['private'].country === country;
-      }).sort(function (a, b) {
-        return b.value['private']['net present value'] - a.value['private']['net present value'];
+    var filtered = d3.selectAll('.demographic').filter(function (d) {
+      return d.value['private'].country === country &&
+        !isNaN(d.value['private']['net present value']);
+    }).sort(function (a, b) {
+      return b.value['private']['net present value'] - a.value['private']['net present value'];
+    });
+
+    var g = svg.selectAll('g').data(filtered.data())
+      .enter().append('g')
+      .attr('class', function (d) { return d.key; })
+      .attr('transform', function (d, i) {
+        return 'translate(' + (i * _colWidth) + ',0)';
       });
 
-      var g = svg.selectAll('g').data(filtered)
-        .enter().append('g')
-        .attr('transform', function (d, i) {
-          return 'translate(' + (i * 2 * _maxR) + ',0)';
-        });
+    g.append('circle')
+      .attr('class', 'net-present-value')
+      .attr('cx', _colWidth / 2)
+      .attr('cy', function (d) { return _colWidth - d.radius; })
+      .attr('r', function (d) { return d.radius; });
 
-      g.append('circle')
-        .attr('class', function (d) { return d.key; })
-        .attr('cx', _maxR)
-        .attr('cy', function (d) { return 2 * _maxR - d.radius; })
-        .attr('r', function (d) { return d.radius; });
-
-      g.append('text')
-        .attr('class', 'label')
-        .attr('x', _maxR)
-        .attr('y', 2 * _maxR + 16)
-        .text(function (d) {
-          var f = d3.format(',.0f');
-          return '$' + f(d.value['private']['net present value']);
-        });
-
-      $tooltip.children('h3').text(country);
-      $tooltip.children('.flag')
-        .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
-
-      $tooltip.css({
-        'min-width': filtered.length * 2 * _maxR,
-        'left': Math.max(0, translate.left + d.x - $tooltip.outerWidth() * 0.5),
-        'top': Math.max(0, translate.top + d.y - $tooltip.outerHeight() - d.radius)
+    g.append('text')
+      .attr('class', 'label')
+      .attr('x', _colWidth / 2)
+      .attr('y', _colWidth + 16)
+      .text(function (d) {
+        var f = d3.format(',.0f');
+        return '$' + f(d.value['private']['net present value']);
       });
-    };
+
+    $tooltip.children('h3').text(country);
+    $tooltip.children('.flag')
+      .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
+
+    $tooltip.css('min-width', filtered.data().length * _colWidth)
+      .css({
+        'left': Math.max(0, translate.left + d.radius - $tooltip.outerWidth() * 0.5),
+        'top': Math.max(0, translate.top - $tooltip.outerHeight() - d.radius)
+      });
+
+    _hover = d;
+    d3.selectAll('.demographic').classed('unfocused', function (d) {
+      return d.value['private'].type !== 'average' &&
+        d.value['private'].country !== _hover.value['private'].country;
+    });
   }
 
   function hideTooltip(d) {
     $('#' + d.key.replace(/\s+/g, '_')).hide().remove();
+    if (d === _hover) {
+      _hover = null;
+      d3.selectAll('.demographic').classed('unfocused', false);
+    }
   }
 
   function isValid(d) {
@@ -294,21 +305,6 @@ function bubble() {
 
   function isInvalid(d) {
     return !isValid.call(this, d);
-  }
-
-  function onMouseover(d) {
-    _hover = d;
-    d3.selectAll('.demographic').classed('unfocused', function (d) {
-      return d.value['private'].type !== 'average' &&
-        d.value['private'].country !== _hover.value['private'].country;
-    });
-  }
-
-  function onMouseout(d) {
-    if (d === _hover) {
-      _hover = null;
-      d3.selectAll('.demographic').classed('unfocused', false);
-    }
   }
 
   function titleTransform(d, i) {

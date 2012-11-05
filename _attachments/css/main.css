@@ -30,9 +30,9 @@ header i {
 
 header nav {
     text-align: right;
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    /*position: absolute;*/
+    /*bottom: 0;*/
+    /*right: 0;*/
 }
 
 h1, h2, h3, h4, h5 {
@@ -199,4 +199,45 @@ circle:hover {
     stroke: #888;
     stroke-width: 1;
     stroke-dasharray: 4, 3;
+}
+
+.legend {
+    table-layout: fixed;
+}
+
+.legend .swatch {
+    min-width: 0.875em;
+    min-height: 0.875em;
+}
+
+.legend .male.post-secondary {
+    background-color: #53A5B6;
+}
+
+.legend .male.tertiary {
+    background-color: #0A527E;
+}
+
+.legend .female.post-secondary {
+    background-color: #E7BDC6;
+}
+
+.legend .female.tertiary {
+    background-color: #CB7C97;
+}
+
+.legend .direct-cost.swatch {
+    background-color: #424143;
+}
+
+.legend .foregone-earnings.swatch {
+    background-color: #67666A;
+}
+
+.legend .social-contribution.swatch {
+    background-color: #8C8B90;
+}
+
+.legend .transfers-effect.swatch {
+    background-color: #CAC8D0;
 }

@@ -18,15 +18,15 @@
     <body>
         <header class="container-fluid">
             <div class="row-fluid">
-                <h1 class="span5">
+                <h1 class="span4">
                     <span class="small">Financial Returns</span><br />
                     <i>on</i> Education
                 </h1>
 
-                <nav class="span7">
-                    <a href="#npv">Net Present Value</a>
-                    <a href="#benefits">Total Benefits</a>
-                    <a href="#costs">Public vs. Private Costs</a>
+                <nav>
+                    <a href="#npv" class="span2 offset2">Net Present Value</a>
+                    <a href="#benefits" class="span2">Total Benefits</a>
+                    <a href="#costs" class="span2">Public vs. Private Costs</a>
                 </nav>
             </div>
         </header>
@@ -37,9 +37,32 @@
                     <article id="npv">
                         <h2>Net Present Value</h2>
                         <p>This chart compares the <em>Net Present Value</em> for men and women with a <em>Post-Secondary (Non-Tertiary)</em> or <em>Tertiary</em> education.</p>
+                        <table class="legend row-fluid">
+                            <tr>
+                                <th />
+                                <th>Tertiary</th>
+                                <th>Post-Secondary</th>
+                            </tr>
+                            <tr>
+                                <th>Men</th>
+                                <td class="male tertiary swatch" />
+                                <td class="male post-secondary swatch" />
+                            </tr>
+                            <tr>
+                                <th>Women</th>
+                                <td class="female tertiary swatch" />
+                                <td class="female post-secondary swatch" />
+                            </tr>
+                        </table>
 
                         <h5>Net Present Value</h5>
                         <p>Each circle's area corresponds to the Net Present Value of its demographic. The Net Present Value is the amount of additional money (in U.S. Dollars) someone in that demographic earns over the course of their working life as a result of attaining that level of education after subtracting the cost of that education.</p>
+
+                        <h5>Tertiary Attainment</h5>
+                        <p></p>
+
+                        <h5>Post-Secondary Attainment</h5>
+                        <p></p>
                     </article>
 
                     <article id="costs" style="display:none">
@@ -59,6 +82,24 @@
                     <article id="benefits" style="display:none">
                         <h2>Who has the highest NPV?</h2>
                         <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
+                        <table class="legend">
+                            <tr>
+                                <td class="direct-cost swatch" />
+                                <th>Direct Cost</th>
+                            </tr>
+                            <tr>
+                                <td class="foregone-earnings swatch" />
+                                <th>Foregone Earnings</th>
+                            </tr>
+                            <tr>
+                                <td class="social-contribution swatch" />
+                                <th>Social Contribution Effect</th>
+                            </tr>
+                            <tr>
+                                <td class="transfers-effect swatch" />
+                                <th>Transfers Effect</th>
+                            </tr>
+                        </table>
                     </article>
                 </div>
 

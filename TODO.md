@@ -1,13 +1,12 @@
 # TODO
 
 ## Bugs
-- Labels disappare on pie chart when changing filters
+- Labels disappar on pie chart when changing filters
 
 ## Charts
-- Legends
-- Tooltips
 - Axes titles missing on scatter plot
 - Add padding to domain and range on scatter plot
+- Highlight OECD/EU countries when hovering over averages in the bubble chart
 - Callouts for significant data points
 	- Highest/lowest
 	- Average
