@@ -118,7 +118,8 @@ function bubble() {
           }
 
           return 'translate(' + d.x + ',' + (-_colWidth / 2) + ')';
-        });
+        })
+        .style('opacity', 1);
 
     average.selectAll('.label').data(function (d) {
         return [d.value['private']['gender']];
