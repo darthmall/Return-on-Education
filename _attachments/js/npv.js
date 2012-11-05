@@ -76,7 +76,6 @@ function bubble() {
     average.transition().duration(750)
         .attr('transform', function (d) {
           d.x = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.3 : 0.6);
-          d.y = 50;
 
           if (d.key.indexOf('female') >= 0) {
             d.x += d.radius + 5;
@@ -84,8 +83,20 @@ function bubble() {
             d.x -= d.radius + 5;
           }
 
-          return 'translate(' + d.x + ',' + d.y + ')';
+          return 'translate(' + d.x + ',0)';
         });
+
+    average.selectAll('.label').data(function (d) {
+        return [d.value['private']['country'], d.value['private']['gender']];
+      })
+      .enter().append('text')
+        .attr('class', 'label')
+        .attr('dy', function (d, i) {
+          var s = Number(d3.select(this).style('font-size').slice(0, -2));
+          console.log(s);
+          return (i === 0 ? -s / 2 : s / 2);
+        })
+        .text(function (d) { return d; });
 
     _force.nodes(nodes.values()).links(links).on('tick', function (e) {
       var targetY = _size[1] * 0.5,
@@ -97,6 +108,9 @@ function bubble() {
 
         d.x += (targetX - d.x) * _gravity * e.alpha;
         d.y += (targetY - d.y) * _gravity * e.alpha;
+
+        d.x = Math.min(_size[0] - d.radius, Math.max(d.x, d.radius));
+        d.y = Math.min(_size[1] - d.radius, Math.max(d.y, d.radius));
       }
 
       countries.attr('transform', function (d) {
@@ -120,9 +134,6 @@ function bubble() {
         return 'translate(' + _size[0] + ',' + (_size[1]/2) + ')rotate(90)';
       }).append('text')
           .attr('class', 'title')
-          .attr('dy', function () {
-            return that.classed('x') ? d3.select(this).style('font-size') : null;
-          })
           .text(function () {
             return that.classed('x') ? 'Tertiary' : 'Post-Secondary';
           });

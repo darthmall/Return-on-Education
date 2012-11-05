@@ -1,6 +1,6 @@
 (function($) {
 	// Set up the dimensions
-	var margin = { top: 30, right: 30, bottom: 30, left: 100 },
+	var margin = { top: 50, right: 30, bottom: 30, left: 100 },
 		padding = {top: 5, right: 5, bottom: 15, left: 5},
 		width = $('svg').width() - margin.left - margin.right,
 		height = $(window).height() - $('svg').offset().top;
@@ -25,20 +25,20 @@
 	$(window).resize(invalidateSize);
 	$('.chzn-select').change(updateFilter).chosen();
 
-	$('.navbutton').click(function (e) {
-		var id = e.target.getAttribute('data-article'),
+	$('nav a').click(function (e) {
+		var id = e.target.getAttribute('href'),
 			articles = $('article');
 
 		articles.filter(function (i) { return this.getAttribute('id') !== id; })
 			.css('display', 'none');
 
-		$('#' + id).css('display', 'block');
+		$(id).css('display', 'block');
 
 		var url = '';
 
 		chart.stop();
-		
-		if (id === 'costs') {
+
+		if (id === '#costs') {
 			data.forEach(function (d) {
 				function r(a) { return Math.sqrt(a / Math.PI); }
 
@@ -48,7 +48,7 @@
 			});
 
 			chart = publicScatter;
-		} else if (id === 'benefits') {
+		} else if (id === '#benefits') {
 			data.forEach(function (d) {
 				function r(a) { return Math.sqrt(a / Math.PI); }
 
@@ -70,7 +70,7 @@
 
 		$('svg').height(height);
 		chart.size([width, height - margin.top - margin.bottom]);
-		svg.attr('class', 'content ' + id)
+		svg.attr('class', 'content ' + id.slice(1))
 				.selectAll('.demographic').call(chart);
 		svg.selectAll('.axis').call(chart.axes);
 	});
@@ -89,7 +89,7 @@
 			}
 		});
 
-		var demographic = svg.selectAll('.demographic')
+		var demographic = svg.select('.data').selectAll('.demographic')
 				.data(data, function (d) { return d.key; });
 
 		demographic.enter().append('g')

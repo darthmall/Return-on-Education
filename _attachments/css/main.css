@@ -50,8 +50,21 @@ h5:after {
     content: ' ';
 }
 
-label {
-    font-weight: bold;
+header i {
+    display: block;
+    font-family: 'Gentium Book Basic' serif;
+    font-size: 0.389em;
+    text-transform: lowercase;
+}
+
+nav a,
+nav a:visited {
+    color: #333;
+    display: inline-block;
+    font-family: 'Open Sans' sans-serif;
+    font-weight: 600;
+    margin: 0.5em;
+    text-decoration: none;
 }
 
 svg {
@@ -169,16 +182,17 @@ circle:hover {
     fill: #67666A;
 }
 
-.npv .demographic.average.male path,
-.benefits .income-tax-effect {
-    fill: #807F83;
-}
-
 .benefits .social-contribution {
     fill: #8C8B90;
 }
 
-.npv .demographic.average.female path,
 .benefits .transfers-effect {
     fill: #CAC8D0;
+}
+
+.npv .demographic.average path {
+    fill: #ddd;
+    stroke: #888;
+    stroke-width: 2;
+    stroke-dasharray: 4, 3;
 }
