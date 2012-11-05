@@ -12,7 +12,6 @@ body {
 }
 
 header {
-    box-shadow: 0 2px 4px #ccc;
     margin-bottom: 2.8em;
     position: relative;
 }
@@ -120,13 +119,9 @@ circle:hover {
     fill: #888;
 }
 
-.axis .title {
-    font-size: 0.875em;
-}
-
 .title {
     fill: #aaa;
-    font-size: 1.969em;
+    font-size: 0.875em;
     font-weight: 800;
     line-height: 0.9em;
     text-anchor: middle;

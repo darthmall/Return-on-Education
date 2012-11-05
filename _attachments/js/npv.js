@@ -121,15 +121,23 @@ function bubble() {
         });
 
     average.selectAll('.label').data(function (d) {
-        return [d.value['private']['country'], d.value['private']['gender']];
+        return [d.value['private']['gender']];
       })
       .enter().append('text')
         .attr('class', 'label')
-        .attr('y', function (d, i) {
-          var s = Number(d3.select(this).style('font-size').slice(0, -2));
-          return (i === 0 ? -s / 2 : s / 2);
+        .attr('dy', function (d) {
+          var fs = Number(d3.select(this).style('font-size').slice(0, -2));
+          return (fs * 0.25) + 'px';
         })
         .text(function (d) { return d; });
+
+    average.filter(function (d) { return d.key.indexOf('female') < 0; })
+        .selectAll('.title').data(function (d) { return [d.value['private']['country']]; })
+      .enter().append('text')
+        .attr('class', 'title')
+        .attr('y', _colWidth * 0.5)
+        .attr('x', _colWidth * 0.5)
+        .text(String);
 
     _force.nodes(nodes.values()).links(links).on('tick', function (e) {
       var targetY = _size[1] * 0.5,
@@ -137,7 +145,7 @@ function bubble() {
 
       for (var i = 0; i < nodeList.length; i++) {
         var d = nodeList[i],
-          targetX = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.25 : 0.75);
+          targetX = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.3 : 0.7);
 
         d.x += (targetX - d.x) * _gravity * e.alpha;
         d.y += (targetY - d.y) * _gravity * e.alpha;
@@ -280,7 +288,6 @@ function bubble() {
 
   function isValid(d) {
     return !d3.select(this).classed('hidden') &&
-      d.value['private'].country !== 'EU21 Average' &&
       !isNaN(d.value['private']['net present value']);
   }
 
