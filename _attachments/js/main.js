@@ -1,7 +1,6 @@
 (function($) {
 	// Set up the dimensions
 	var margin = { top: 100, right: 18, bottom: 10, left: 18 },
-		padding = {top: 5, right: 5, bottom: 15, left: 5},
 		width = $('svg').width() - margin.left - margin.right,
 		height = $(window).height() - $('svg').offset().top;
 
