@@ -3,9 +3,9 @@ function multiples() {
   var _size = [1, 1],
     _colWidth = 50,
     _padding = 5,
+    _fields = ['net present value', 'direct cost', 'foregone earnings'],
     _pie = d3.layout.pie().sort(function (a, b) {
-          var order = ['net-present-value', 'direct-cost', 'foregone-earnings',
-              'income-tax-effect', 'social-contribution', 'transfers-effect'];
+          var order = ['net-present-value', 'direct-cost', 'foregone-earnings'];
 
           return order.indexOf(a.className) - order.indexOf(b.className);
         })
@@ -42,9 +42,7 @@ function multiples() {
               r = d.radius,
               entries = d3.entries(d.value['private'])
                 .filter(function (d) {
-                  return (d.key === 'net present value' || d.value < 0) &&
-                      !isNaN(d.value) &&
-                      d.key !== 'total costs';
+                  return (_fields.indexOf(d.key) >= 0) && !isNaN(d.value);
                 });
 
               entries.forEach(function (d) {
@@ -166,28 +164,29 @@ function multiples() {
       var translate = $(this).offset(),
         country = d.value['private'].country,
         id = d.key.replace(/\s+/g, '_'),
-        $tip = $('<div class="tooltip"><h3></h3><img class="flag" />' +
-          '<table><tr><td>Total Benefits</td><td class="total-benefits" /></tr>' +
-          '<tr><td>Income Tax Effect</td><td class="income-tax-effect" /></tr>' +
-          '<tr><td>Direct Cost</td><td class="direct-cost" /></tr>' +
-          '<tr><td>Foregone Earnings</td><td class="foregone-earnings" /></tr>' +
-          '<tr><td>Social Contribution Effect</td><td class="social-contribution" /></tr>' +
-          '<tr><td>Transfers Effect</td><td class="transfers-effect" /></tr>' +
-          '<tr><th>Net Present Value</th><th class="net-present-value" /></tr>' +
-          '</table></div>')
-            .attr('id', id).appendTo('body');
+        $tip = $('<div class="tooltip benefits"><h3></h3><img class="flag" /></div>')
+            .attr('id', id).appendTo('body'),
+        $table = $('<table><tr><th>Total Benefits</th><td class="total-benefits" /></tr></table>')
+            .appendTo($tip),
+        f = d3.format(',.0f'),
+        npv = d.value['private']['total benefits'];
 
         $tip.children('h3').text(country);
         $tip.children('.flag')
             .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
-        $tip.find('.total-benefits').text(d.value['private']['total benefits']);
-        $tip.find('.income-tax-effect').text(d.value['private']['income tax effect']);
-        $tip.find('.direct-cost').text(d.value['private']['direct cost']);
-        $tip.find('.foregone-earnings').text(d.value['private']['foregone earnings']);
-        $tip.find('.social-contribution').text(d.value['private']['social contribution']);
-        $tip.find('.transfers-effect').text(d.value['private']['transfers effect']);
-        $tip.find('.net-present-value').text(d.value['private']['net present value']);
+        $table.find('.total-benefits').text(f(d.value['private']['total benefits']));
+
+        _fields.forEach(function (field) {
+          if (field !== 'net present value') {
+            npv += d.value['private'][field];
+            $('<tr><th>' + field + '</th><td>' + f(d.value['private'][field]) + '</td></tr>')
+                .appendTo($table);
+          }
+        });
+        
+        $('<tr><th>Net Present Value</th><td>' + f(npv) + '</td></tr>')
+            .appendTo($table);
 
         $tip.css({
           'left': Math.max(0, translate.left + d.radius - $tip.width() * 0.5),

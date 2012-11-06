@@ -75,6 +75,11 @@ nav a:visited {
     text-decoration: none;
 }
 
+th {
+    text-align: left;
+    text-transform: capitalize;
+}
+
 svg {
     display: block;
     font-family: 'Open Sans' sans-serif;
@@ -179,25 +184,26 @@ svg {
     opacity: 0.9;
 }
 
-.benefits .income-tax-effect {
-
-    fill: #424143;
-}
-
 .benefits .direct-cost {
-    fill: #67666A;
+    fill: #eee;
 }
 
 .benefits .foregone-earnings {
-    fill: #8C8B90;
-}
-
-.benefits .social-contribution {
     fill: #CAC8D0;
 }
 
-.benefits .transfers-effect {
-    fill: #eee;
+.tooltip table {
+    clear: both;
+    width: 100%;
+}
+
+.tooltip.benefits th {
+    text-align: left;
+    text-transform: capitalize;
+}
+
+.tooltip.benefits td {
+    text-align: right;
 }
 
 .npv .demographic.average path {
@@ -232,22 +238,10 @@ svg {
     background-color: #CB7C97;
 }
 
-.legend .income-tax-effect.swatch {
-    background-color: #424143;
-}
-
-.legend .direct-cost.swatch {
-    background-color: #67666A;
-}
-
 .legend .foregone-earnings.swatch {
-    background-color: #8C8B90;
-}
-
-.legend .social-contribution.swatch {
     background-color: #CAC8D0;
 }
 
-.legend .transfers-effect.swatch {
+.legend .direct-cost.swatch {
     background-color: #eee;
 }
