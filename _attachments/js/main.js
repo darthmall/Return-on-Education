@@ -106,7 +106,7 @@
 	function invalidateSize() {
 		var $svg = $('svg'),
 			width = $svg.width() - chart.margin.left - chart.margin.right,
-			height = $(window).height() - $svg.offset().top;
+			height = Math.max(660, $(window).height() - $svg.offset().top);
 
 		$svg.height(height);
 
