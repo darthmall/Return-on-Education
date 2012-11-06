@@ -283,10 +283,9 @@ function bubble() {
     $tooltip.children('.flag')
       .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
-    $tooltip.css('min-width', filtered.data().length * _colWidth)
-      .css({
+    $tooltip.css({
         'left': Math.max(0, translate.left + d.radius - $tooltip.outerWidth() * 0.5),
-        'top': Math.max(0, translate.top - $tooltip.outerHeight() - d.radius)
+        'top': Math.max(0, translate.top - $tooltip.outerHeight() - 5)
       });
 
     _hover = d;

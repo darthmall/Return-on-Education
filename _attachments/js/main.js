@@ -54,9 +54,7 @@
 			data.forEach(function (d) {
 				function r(a) { return Math.sqrt(a / Math.PI); }
 
-				if (!isNaN(d.value['private']['total benefits'])) {
-					d.radius = r(area(d.value['private']['total benefits']));
-				}
+				d.radius = r(area(grossIncome(d)));
 			});
 			chart = sorted;
 		} else {
@@ -79,7 +77,7 @@
 	d3.json('_list/public_v_private/incentives?reduce=false', function (json) {
 		data = json;
 		area.domain([0, d3.max(data, function (d) {
-			return Math.max(d.value['private']['total benefits'], d.value['public']['total benefits']) || 0;
+			return grossIncome(d);
 		})]);
 
 		data.forEach(function (d) {
@@ -132,6 +130,12 @@
 		var format = d3.format(',.0f');
 
 		return '$' + format(x);
+	}
+
+	function grossIncome(d) {
+		return (d.value['private']['gross earnings benefits'] || 0) +
+						(d.value['private']['unemployment effect'] || 0) +
+						(d.value['private']['grants effect'] || 0);
 	}
 
 	function updateFilter(e, o) {

@@ -102,6 +102,7 @@ svg {
     border-radius: 3px;
     padding: 0.5em;
     position: absolute;
+    width: 300px;
 }
 
 .tooltip h3 {
@@ -192,6 +193,18 @@ svg {
     fill: #CAC8D0;
 }
 
+.benefits .income-tax-effect {
+    fill: #aaa;
+}
+
+.benefits .social-contribution-effect {
+    fill: #888;
+}
+
+.benefits .transfers-effect {
+    fill: #555;
+}
+
 .tooltip table {
     clear: both;
     width: 100%;
@@ -244,4 +257,16 @@ svg {
 
 .legend .direct-cost.swatch {
     background-color: #eee;
+}
+
+.legend .income-tax-effect.swatch {
+    background-color: #aaa;
+}
+
+.legend .social-contribution-effect.swatch {
+    background-color: #888;
+}
+
+.legend .transfers-effect.swatch {
+    background-color: #555;
 }

@@ -3,9 +3,9 @@ function multiples() {
   var _size = [1, 1],
     _colWidth = 50,
     _padding = 5,
-    _fields = ['net present value', 'direct cost', 'foregone earnings'],
+    _fields = ['net present value', 'direct cost', 'foregone earnings', 'income tax effect', 'social contribution effect', 'transfers effect'],
     _pie = d3.layout.pie().sort(function (a, b) {
-          var order = ['net-present-value', 'direct-cost', 'foregone-earnings'];
+          var order = ['net-present-value', 'direct-cost', 'foregone-earnings', 'income-tax-effect', 'social-contribution-effect', 'transfers-effect'];
 
           return order.indexOf(a.className) - order.indexOf(b.className);
         })
@@ -168,24 +168,25 @@ function multiples() {
             .attr('id', id).appendTo('body'),
         $table = $('<table><tr><th>Total Benefits</th><td class="total-benefits" /></tr></table>')
             .appendTo($tip),
-        f = d3.format(',.0f'),
-        npv = d.value['private']['total benefits'];
+        f = d3.format(',.0f');
 
         $tip.children('h3').text(country);
         $tip.children('.flag')
             .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
-        $table.find('.total-benefits').text(f(d.value['private']['total benefits']));
+        $table.find('.total-benefits').text(f((d.value['private']['gross earnings benefits'] || 0) +
+          (d.value['private']['unemployment effect'] || 0) +
+          (d.value['private']['grants effect'] || 0)));
 
         _fields.forEach(function (field) {
-          if (field !== 'net present value') {
-            npv += d.value['private'][field];
-            $('<tr><th>' + field + '</th><td>' + f(d.value['private'][field]) + '</td></tr>')
+          var v = d.value['private'][field];
+          if (field !== 'net present value' && !isNaN(v) && v !== 0) {
+            $('<tr><th>' + field + '</th><td>' + f(v) + '</td></tr>')
                 .appendTo($table);
           }
         });
         
-        $('<tr><th>Net Present Value</th><td>' + f(npv) + '</td></tr>')
+        $('<tr><th>Net Present Value</th><td>' + f(d.value['private']['net present value']) + '</td></tr>')
             .appendTo($table);
 
         $tip.css({
