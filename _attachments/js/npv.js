@@ -10,15 +10,16 @@ eag.bubble = function () {
     _colWidth = 100,
     _arc = d3.svg.arc().startAngle(0).endAngle(2 * Math.PI)
         .innerRadius(0).outerRadius(function (d) { return d.radius; }),
-    _hover = null;
+    _hover = null,
+    _cache = null;
 
   function chart(g) {
     var selection = g.filter(isValid),
       countries = selection.filter(function (d) {
-        return d.value['private'].type === 'country';
+        return d.type === 'country';
       }),
       average = selection.filter(function (d) {
-        return d.value['private'].type === 'average';
+        return d.type === 'average';
       });
 
     var nodes = d3.map({}),
@@ -31,7 +32,9 @@ eag.bubble = function () {
 
     var path = selection.selectAll('path')
         .data(function (d) { return [d]; },
-          function (d) { return d.key + ' net present value'; });
+          function (d) {
+            return [d.country, d.attainment, d.gender, 'net present value'].join(' ');
+          });
 
     path.enter().append('path');
 
@@ -46,15 +49,10 @@ eag.bubble = function () {
     selection.selectAll('.label').remove();
 
     countries.data().forEach(function (d) {
-      nodes.set(d.key, d);
+      var linkKey = [d.country, d.attainment,
+          ((d.gender === 'male') ? 'female' : 'male')].join(' ');
 
-      var linkKey = d.key;
-
-      if (linkKey.indexOf('female') >= 0) {
-        linkKey.replace('female', 'male');
-      } else {
-        linkKey.replace('male', 'female');
-      }
+      nodes.set([d.country, d.attainment, d.gender].join(' '), d);
 
       if (nodes.has(linkKey)) {
         links.push({
@@ -80,52 +78,31 @@ eag.bubble = function () {
 
     average.transition().duration(750)
         .attr('transform', function (d) {
+          if (d.attainment === 'tertiary') {
+            d.x = _size[0] * 0.25;
+          } else {
+            d.x = _size[0] * 0.75;
+          }
 
-          switch(d.key) {
-          case 'OECD average tertiary male':
-            d.x = _size[0] * 0.25 - _colWidth * 1.5;
-            break;
-
-          case 'OECD average tertiary female':
-            d.x = _size[0] * 0.25 - _colWidth * 0.5;
-            break;
-
-          case 'EU21 average tertiary male':
-            d.x = _size[0] * 0.25 + _colWidth * 0.5;
-            break;
-
-          case 'EU21 average tertiary female':
-            d.x = _size[0] * 0.25 + _colWidth * 1.5;
-            break;
-
-          case 'OECD average post-secondary male':
-            d.x = _size[0] * 0.75 - _colWidth * 1.5;
-            break;
-
-          case 'OECD average post-secondary female':
-            d.x = _size[0] * 0.75 - _colWidth * 0.5;
-            break;
-
-          case 'EU21 average post-secondary male':
-            d.x = _size[0] * 0.75 + _colWidth * 0.5;
-            break;
-
-          case 'EU21 average post-secondary female':
-            d.x = _size[0] * 0.75 + _colWidth * 1.5;
-            break;
-
-          default:
-            d.x = 0;
-            break;
+          if (d.country === 'OECD average') {
+            if (d.gender === 'male') {
+              d.x -= _colWidth * 1.5;
+            } else {
+              d.x -= _colWidth * 0.5;
+            }
+          } else {
+            if (d.gender === 'male') {
+              d.x += _colWidth * 0.5;
+            } else {
+              d.x += _colWidth * 1.5;
+            }
           }
 
           return 'translate(' + d.x + ',' + (-_colWidth / 2) + ')';
         })
         .style('opacity', 1);
 
-    average.selectAll('.label').data(function (d) {
-        return [d.value['private']['gender']];
-      })
+    average.selectAll('.label').data(function (d) { return [d.gender]; })
       .enter().append('text')
         .attr('class', 'label')
         .attr('dy', function (d) {
@@ -134,21 +111,21 @@ eag.bubble = function () {
         })
         .text(function (d) { return d; });
 
-    average.filter(function (d) { return d.key.indexOf('female') < 0; })
-        .selectAll('.title').data(function (d) { return [d.value['private']['country']]; })
+    average.filter(function (d) { return d.gender === 'male'; })
+        .selectAll('.title').data(function (d) { return [d.country]; })
       .enter().append('text')
         .attr('class', 'title')
         .attr('y', _colWidth * 0.5)
         .attr('x', _colWidth * 0.5)
         .text(String);
 
-    _force.nodes(nodes.values()).links(links).on('tick', function (e) {
+    _force.nodes(countries.data()).on('tick', function (e) {
       var targetY = _size[1] * 0.5,
         nodeList = nodes.values();
 
       for (var i = 0; i < nodeList.length; i++) {
         var d = nodeList[i],
-          targetX = _size[0] * ((d.key.indexOf('tertiary') >= 0) ? 0.3 : 0.7);
+          targetX = _size[0] * ((d.attainment === 'tertiary') ? 0.3 : 0.7);
 
         d.x += (targetX - d.x) * _gravity * e.alpha;
         d.y += (targetY - d.y) * _gravity * e.alpha;
@@ -182,6 +159,16 @@ eag.bubble = function () {
             return that.classed('x') ? 'Tertiary' : 'Post-Secondary';
           });
     });
+  };
+
+  chart.cache = function(data) {
+      if (arguments.length < 1) {
+          return _cache;
+      }
+  
+      _cache = data;
+  
+      return chart;
   };
 
   chart.colWidth = function(colWidth) {
@@ -239,7 +226,7 @@ eag.bubble = function () {
 
   function showTooltip (d) {
     var translate = $(this).offset(),
-      country = d.value['private'].country,
+      country = d.country,
       id = d.key.replace(/\s+/g, '_'),
       $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /><div class="clearfix" /></div>')
           .attr('id', id).appendTo('body'),
@@ -248,18 +235,18 @@ eag.bubble = function () {
           .domain(eag.area.domain());
 
     d3.selectAll('.demographic').filter(function (d) {
-      return d.value['private'].country === country &&
-        !isNaN(d.value['private']['net present value']) &&
-        d.value['private']['net present value'] !== 0;
+      return d.country === country &&
+        !isNaN(d['net present value']) &&
+        d['net present value'] !== 0;
     }).sort(function (a, b) {
-      return b.value['private']['net present value'] - a.value['private']['net present value'];
+      return b['net present value'] - a['net present value'];
     }).data().forEach(function (el) {
       var $bar = $('<div class="bar" />')
           .addClass(el.key)
-          .text(eag.dollars(el.value['private']['net present value']))
+          .text(eag.dollars(el['net present value']))
           .appendTo($bars);
       $('<div class="fill net-present-value" />')
-            .width(width(el.value['private']['net present value']))
+            .width(width(el['net present value']))
             .appendTo($bar);
     });
 
@@ -274,8 +261,8 @@ eag.bubble = function () {
 
     _hover = d;
     d3.selectAll('.demographic').classed('unfocused', function (d) {
-      return d.value['private'].type !== 'average' &&
-        d.value['private'].country !== _hover.value['private'].country;
+      return d.type !== 'average' &&
+        d.country !== _hover.country;
     });
   }
 
@@ -289,7 +276,7 @@ eag.bubble = function () {
 
   function isValid(d) {
     return !d3.select(this).classed('hidden') &&
-      !isNaN(d.value['private']['net present value']);
+      !isNaN(d['net present value']);
   }
 
   function isInvalid(d) {
@@ -307,7 +294,6 @@ eag.bubble = function () {
 
     return 'translate(' + x + ',' + y + ') rotate(' + theta + ')';
   }
-
   
   return chart;
 };

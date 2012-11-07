@@ -9,7 +9,8 @@ eag.scatter = function () {
         .innerRadius(0).outerRadius(function (d) { return d.radius; }),
     _xaxis = d3.svg.axis().orient('bottom'),
     _yaxis = d3.svg.axis().orient('left'),
-    _hover = null;
+    _hover = null,
+    _cache = null;
 
     function chart(g) {
       var selection = g.filter(isValid);
@@ -17,10 +18,10 @@ eag.scatter = function () {
       var data = g.data();
 
       _x.domain([0, d3.max(data, function (d) {
-        return eag.grossIncome(d);
+        return d.value['private']['net present value'];
       }) * 1.05]);
       _y.domain([0, d3.max(data, function (d) {
-        return d.value['private']['net present value'];
+        return d.value['public']['net present value'];
       }) * 1.05]);
 
       _xaxis.scale(_x);
@@ -78,14 +79,13 @@ eag.scatter = function () {
 
         fs = text.style('font-size').slice(0, -2);
 
-
         if (axis.classed('x')) {
           text.attr('transform', 'translate(' + (_size[0] / 2) + ',40)')
-              .text('Private Costs');
+              .text('Private Net Present Value');
         } else {
           text.attr('dy', fs)
               .attr('transform', 'translate(-90,' + (_size[1] / 2) + ')rotate(-90)')
-              .text('Public Costs');
+              .text('Public Net Present Value');
         }
       });
 
@@ -114,6 +114,16 @@ eag.scatter = function () {
       g.transition().duration(750).style('opacity', 1);
     };
 
+    chart.cache = function(data) {
+        if (arguments.length < 1) {
+            return _cache;
+        }
+    
+        _cache = data;
+    
+        return chart;
+    };
+    
     chart.size = function (dimensions) {
         if (arguments.length < 1) {
             return _size;

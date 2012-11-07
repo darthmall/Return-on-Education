@@ -10,9 +10,9 @@ eag.dollars = function (x) {
 };
 
 eag.grossIncome = function (d) {
-	return (d.value['private']['gross earnings benefits'] || 0) +
-					(d.value['private']['unemployment effect'] || 0) +
-					(d.value['private']['grants effect'] || 0);
+	return (d['gross earnings benefits'] || 0) +
+			(d['unemployment effect'] || 0) +
+			(d['grants effect'] || 0);
 };
 
 eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
@@ -61,7 +61,7 @@ eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
 		chart.stop();
 
 		if (id === '#costs') {
-			data.forEach(function (d) { d.radius = 2; });
+			data.forEach(function (d) { d.radius = 3; });
 			chart = publicScatter;
 		} else if (id === '#benefits') {
 			data.forEach(function (d) {
@@ -70,8 +70,8 @@ eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
 			chart = sorted;
 		} else {
 			data.forEach(function (d) {
-				if (!isNaN(d.value['private']['net present value'])) {
-					d.radius = eag.radius(d.value['private']['net present value']);
+				if (!isNaN(d['net present value'])) {
+					d.radius = eag.radius(d['net present value']);
 				}
 			});
 			chart = npv;
@@ -83,15 +83,19 @@ eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
 		return false;
 	});
 
-	d3.json('_list/public_v_private/incentives?reduce=false', function (json) {
-		data = json;
+	d3.json('_view/incentives?reduce=false&endkey="private"', function (json) {
+		data = json.rows.map(function (r) {
+			r.value.key = [r.value.country, r.value.attainment, r.value.gender, r.sector].join(' ');
+			return r.value;
+		});
+
 		eag.area.domain([0, d3.max(data, function (d) {
 			return eag.grossIncome(d);
 		})]);
 
 		data.forEach(function (d) {
-			if (!isNaN(d.value['private']['net present value'])) {
-				d.radius = eag.radius(d.value['private']['net present value']);
+			if (!isNaN(d['net present value'])) {
+				d.radius = eag.radius(d['net present value']);
 			}
 		});
 
@@ -100,7 +104,9 @@ eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
 
 		demographic.enter().append('g')
 				.attr('class', function (d) {
-					return 'demographic ' + d.key;
+					return [d.country, d.attainment, d.gender, d.type, d.sector, 'demographic']
+							.map(function (d) { return d.replace(/\s+/g, '-'); })
+							.join(' ');
 				});
 
 		demographic.call(chart);
@@ -135,7 +141,7 @@ eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
 			d3.selectAll('.demographic').classed('hidden', false).call(chart);
 		} else {
 			d3.selectAll('.demographic').classed('hidden', function (d) {
-				return (selected.indexOf(d.value['private'].country) < 0);
+				return (selected.indexOf(d.country) < 0);
 			}).call(chart);
 		}
 	}

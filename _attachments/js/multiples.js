@@ -15,7 +15,8 @@ eag.multiples = function () {
           return d.value;
         }),
     _arc = d3.svg.arc().innerRadius(0)
-        .outerRadius(function (d) { return d.data.radius; });
+        .outerRadius(function (d) { return d.data.radius; }),
+    _cache = null;
 
     function chart(g) {
       var selection = g.filter(isValid);
@@ -120,6 +121,16 @@ eag.multiples = function () {
             .style('opacity', 0)
             .remove();
       });
+    };
+
+    chart.cache = function(data) {
+        if (arguments.length < 1) {
+            return _cache;
+        }
+    
+        _cache = data;
+    
+        return chart;
     };
 
     chart.colWidth = function(colWidth) {

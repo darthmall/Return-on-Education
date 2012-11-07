@@ -1,5 +1,5 @@
 function(doc) {
-  if (!isNaN(doc['net present value'])) {
-    emit([doc.country, doc.attainment, doc.gender, doc.sector], doc);
+  if (typeof doc['net present value'] === 'number') {
+    emit(doc.sector, doc);
   }
 }
