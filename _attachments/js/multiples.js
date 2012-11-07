@@ -1,4 +1,6 @@
-function multiples() {
+var eag = eag || {};
+
+eag.multiples = function () {
   // Private variables
   var _size = [1, 1],
     _colWidth = 50,
@@ -88,10 +90,7 @@ function multiples() {
 
       label.selectAll('.npv')
           .attr('y', 34)
-          .text(function (d) {
-            var f = d3.format(',.0f');
-            return '$' + f(d.npv);
-          });
+          .text(function (d) { return eag.dollars(d.npv); });
 
       label.exit().transition().duration(750)
         .style('opacity', 0)
@@ -167,26 +166,25 @@ function multiples() {
         $tip = $('<div class="tooltip benefits"><h3></h3><img class="flag" /></div>')
             .attr('id', id).appendTo('body'),
         $table = $('<table><tr><th>Total Benefits</th><td class="total-benefits" /></tr></table>')
-            .appendTo($tip),
-        f = d3.format(',.0f');
+            .appendTo($tip);
 
         $tip.children('h3').text(country);
         $tip.children('.flag')
             .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
-        $table.find('.total-benefits').text(f((d.value['private']['gross earnings benefits'] || 0) +
+        $table.find('.total-benefits').text(eag.dollars((d.value['private']['gross earnings benefits'] || 0) +
           (d.value['private']['unemployment effect'] || 0) +
           (d.value['private']['grants effect'] || 0)));
 
         _fields.forEach(function (field) {
           var v = d.value['private'][field];
           if (field !== 'net present value' && !isNaN(v) && v !== 0) {
-            $('<tr><th>' + field + '</th><td>' + f(v) + '</td></tr>')
+            $('<tr><th>' + field + '</th><td>' + eag.dollars(v) + '</td></tr>')
                 .appendTo($table);
           }
         });
         
-        $('<tr><th>Net Present Value</th><td>' + f(d.value['private']['net present value']) + '</td></tr>')
+        $('<tr><th>Net Present Value</th><td>' + eag.dollars(d.value['private']['net present value']) + '</td></tr>')
             .appendTo($table);
 
         $tip.css({
@@ -206,4 +204,4 @@ function multiples() {
     }
 
     return chart;
-}
+};

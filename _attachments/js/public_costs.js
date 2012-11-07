@@ -1,4 +1,6 @@
-function scatter() {
+var eag = eag || {};
+
+eag.scatter = function () {
   // Private variables
   var _size = [900, 600],
     _x = d3.scale.linear().range([0, _size[0]]),
@@ -15,10 +17,10 @@ function scatter() {
       var data = g.data();
 
       _x.domain([0, d3.max(data, function (d) {
-        return Math.abs(d.value['private']['total costs']);
+        return eag.grossIncome(d);
       }) * 1.05]);
       _y.domain([0, d3.max(data, function (d) {
-        return Math.abs(d.value['public']['total costs']);
+        return d.value['private']['net present value'];
       }) * 1.05]);
 
       _xaxis.scale(_x);
@@ -55,8 +57,8 @@ function scatter() {
           .on('mouseout', onMouseout)
         .transition().duration(750)
           .attr('transform', function (d) {
-            d.x = _x(Math.abs(d.value['private']['total costs']));
-            d.y = _y(Math.abs(d.value['public']['total costs']));
+            d.x = _x(eag.grossIncome(d));
+            d.y = _y(d.value['private']['net present value']);
 
             return 'translate(' + d.x + ',' + d.y + ')';
           })
@@ -142,33 +144,10 @@ function scatter() {
 
     function onMouseover(d) {
       _hover = d;
-
-      // container.selectAll('.x text')
-      //   .classed('hidden', function (t) {
-      //     return Math.abs(d.value['private']['total costs']) !== t;
-      //   });
-
-      // container.selectAll('.y text')
-      //   .classed('hidden', function (t) {
-      //     return Math.abs(d.value['public']['total costs']) !== t;
-      //   });
     }
 
     function onMouseout(d) {
-      // if (d === _hover) {
-      //   container.selectAll('.x text')
-      //     .classed('hidden', function (t) {
-      //       return !(d3.select(this).classed('title')) && t !== _x.domain()[1];
-      //     });
-
-      //   container.selectAll('.y text')
-      //     .classed('hidden', function (t) {
-      //       return !(d3.select(this).classed('title')) && t !== _y.domain()[1];
-      //     });
-
-      //   _hover = null;
-      // }
     }
 
     return chart;
-}
+};

@@ -1,4 +1,6 @@
-function bubble() {
+var eag = eag || {};
+
+eag.bubble = function () {
   // Private member variables.
   var _force = d3.layout.force().charge(charge).gravity(0)
       .linkDistance(function (l) { return l.source.radius + l.target.radius; }),
@@ -235,49 +237,31 @@ function bubble() {
     return isNaN(d.radius) ? 0 : -Math.pow(d.radius, 2) / 8;
   }
 
-  function dollars(x) {
-    var format = d3.format(',.0f');
-
-    return '$' + format(x);
-  }
-
   function showTooltip (d) {
     var translate = $(this).offset(),
       country = d.value['private'].country,
       id = d.key.replace(/\s+/g, '_'),
-      $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /></div>')
+      $tooltip = $('<div class="tooltip"><h3></h3><img class="flag" /><div class="clearfix" /></div>')
           .attr('id', id).appendTo('body'),
-      svg = d3.select('#' + id).append('svg')
-          .attr('height', _colWidth + 18);
+      $bars = $('<div class="bars"></div>').appendTo($tooltip),
+      width = d3.scale.linear().range([0, $tooltip.width()])
+          .domain(eag.area.domain());
 
-    var filtered = d3.selectAll('.demographic').filter(function (d) {
+    d3.selectAll('.demographic').filter(function (d) {
       return d.value['private'].country === country &&
-        !isNaN(d.value['private']['net present value']);
+        !isNaN(d.value['private']['net present value']) &&
+        d.value['private']['net present value'] !== 0;
     }).sort(function (a, b) {
       return b.value['private']['net present value'] - a.value['private']['net present value'];
+    }).data().forEach(function (el) {
+      var $bar = $('<div class="bar" />')
+          .addClass(el.key)
+          .text(eag.dollars(el.value['private']['net present value']))
+          .appendTo($bars);
+      $('<div class="fill net-present-value" />')
+            .width(width(el.value['private']['net present value']))
+            .appendTo($bar);
     });
-
-    var g = svg.selectAll('g').data(filtered.data())
-      .enter().append('g')
-      .attr('class', function (d) { return d.key; })
-      .attr('transform', function (d, i) {
-        return 'translate(' + (i * _colWidth) + ',0)';
-      });
-
-    g.append('circle')
-      .attr('class', 'net-present-value')
-      .attr('cx', _colWidth / 2)
-      .attr('cy', function (d) { return _colWidth - d.radius; })
-      .attr('r', function (d) { return d.radius; });
-
-    g.append('text')
-      .attr('class', 'label')
-      .attr('x', _colWidth / 2)
-      .attr('y', _colWidth + 16)
-      .text(function (d) {
-        var f = d3.format(',.0f');
-        return '$' + f(d.value['private']['net present value']);
-      });
 
     $tooltip.children('h3').text(country);
     $tooltip.children('.flag')
@@ -326,4 +310,4 @@ function bubble() {
 
   
   return chart;
-}
+};

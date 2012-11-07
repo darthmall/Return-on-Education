@@ -1,3 +1,22 @@
+var eag = eag || {};
+
+eag.maxR = 50;
+eag.area = d3.scale.linear().range([0, Math.PI * eag.maxR * eag.maxR]);
+
+eag.dollars = function (x) {
+	var format = d3.format(',.0f');
+
+	return '$' + format(x);
+};
+
+eag.grossIncome = function (d) {
+	return (d.value['private']['gross earnings benefits'] || 0) +
+					(d.value['private']['unemployment effect'] || 0) +
+					(d.value['private']['grants effect'] || 0);
+};
+
+eag.radius = function (v) { return Math.sqrt(eag.area(v) / Math.PI); };
+
 (function($) {
 	// Set up the dimensions
 	var width = $('svg').width(),
@@ -8,12 +27,9 @@
 	// Groups for the different charts
 	var svg = d3.select('svg .content');
 
-	var maxR = 50,
-			area = d3.scale.linear().range([0, Math.PI * maxR * maxR]);
-
-	var npv = bubble(),
-			publicScatter = scatter(),
-			sorted = multiples().colWidth(maxR * 2);
+	var npv = eag.bubble(),
+			publicScatter = eag.scatter(),
+			sorted = eag.multiples().colWidth(eag.maxR * 2);
 
 	var chart = npv;
 	var data = [];
@@ -23,9 +39,13 @@
 	publicScatter.margin = { top: 5, right: 5, bottom: 50, left: 100 };
 
 	$(window).resize(invalidateSize);
-	$('.chzn-select').change(updateFilter).chosen();
+	$('.chzn-select').chosen().change(updateFilter);
 
 	invalidateSize();
+
+	$('#clear').click(function (e) {
+		$('#country-filter').val([]).change().chosen().trigger('liszt:updated');
+	});
 
 	$('nav a').click(function (e) {
 		var id = e.target.getAttribute('href'),
@@ -41,28 +61,17 @@
 		chart.stop();
 
 		if (id === '#costs') {
-			data.forEach(function (d) {
-				function r(a) { return Math.sqrt(a / Math.PI); }
-
-				if (!isNaN(d.value['private']['income tax effect'])) {
-					d.radius = r(area(Math.abs(d.value['private']['income tax effect'])));
-				}
-			});
-
+			data.forEach(function (d) { d.radius = 2; });
 			chart = publicScatter;
 		} else if (id === '#benefits') {
 			data.forEach(function (d) {
-				function r(a) { return Math.sqrt(a / Math.PI); }
-
-				d.radius = r(area(grossIncome(d)));
+				d.radius = eag.radius(eag.grossIncome(d));
 			});
 			chart = sorted;
 		} else {
 			data.forEach(function (d) {
-				function r(a) { return Math.sqrt(a / Math.PI); }
-
 				if (!isNaN(d.value['private']['net present value'])) {
-					d.radius = r(area(d.value['private']['net present value']));
+					d.radius = eag.radius(d.value['private']['net present value']);
 				}
 			});
 			chart = npv;
@@ -76,15 +85,13 @@
 
 	d3.json('_list/public_v_private/incentives?reduce=false', function (json) {
 		data = json;
-		area.domain([0, d3.max(data, function (d) {
-			return grossIncome(d);
+		eag.area.domain([0, d3.max(data, function (d) {
+			return eag.grossIncome(d);
 		})]);
 
 		data.forEach(function (d) {
-			function r(a) { return Math.sqrt(a / Math.PI); }
-
 			if (!isNaN(d.value['private']['net present value'])) {
-				d.radius = r(area(d.value['private']['net present value']));
+				d.radius = eag.radius(d.value['private']['net present value']);
 			}
 		});
 
@@ -118,30 +125,13 @@
 		svg.selectAll('.axis').call(chart.axes);
 	}
 
-	function sortCost(alpha) {
-		var that = this;
-
-		return function (d) {
-			d.y = d.y + (d.targetY - d.y) * (force.gravity() + 0.02) * alpha;
-		};
-	}
-
-	function dollars(x) {
-		var format = d3.format(',.0f');
-
-		return '$' + format(x);
-	}
-
-	function grossIncome(d) {
-		return (d.value['private']['gross earnings benefits'] || 0) +
-						(d.value['private']['unemployment effect'] || 0) +
-						(d.value['private']['grants effect'] || 0);
-	}
-
 	function updateFilter(e, o) {
-		var selected = $(this).val();
+		var selected = $(this).val(),
+			empty = !(selected && selected.length > 0);
 
-		if (!selected) {
+		$('#clear').attr('disabled', empty);
+
+		if (empty) {
 			d3.selectAll('.demographic').classed('hidden', false).call(chart);
 		} else {
 			d3.selectAll('.demographic').classed('hidden', function (d) {

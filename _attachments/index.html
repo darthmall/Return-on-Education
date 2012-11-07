@@ -58,11 +58,13 @@
                         <h5>Net Present Value</h5>
                         <p>Each circle's area corresponds to the Net Present Value of its demographic. The Net Present Value is the amount of additional money (in U.S. Dollars) someone in that demographic earns over the course of their working life as a result of attaining that level of education after subtracting the cost of that education.</p>
 
-                        <h5>Tertiary Attainment</h5>
-                        <p></p>
+                        <h5>Post-Secondary Education</h5>
+                        <p>Straddles the boundary between upper-secondary (10<sup>th</sup>&ndash;12<sup>th</sup> grade) and tertiary education. Enrollment lasts between six months and two years of full-time study. There are two types of post-secondary education: one prepares students for entry into tertiary education programs; the other prepares them for entry directly into the workforce.</p>
 
-                        <h5>Post-Secondary Attainment</h5>
-                        <p></p>
+                        <h5>Tertiary Education</h5>
+                        <p>Can be broken down into two types of education. <em>Tertiary-type A</em> is largely theory-based and lasts at least three years of full-time study, but is typically four or more. <em>Tertiary-type A</em> programs prepare students to enter advanced research programs or professions with high skill requirements such as medecine. This type of Tertiary education includes second-degree programs such as the American Master's degree.</p>
+
+                        <p><em>Tertiary-type B</em> programs focus on more practical skills than <em>Tertiary-type A</em> programs. These programs have a minimum duration of two years of full-time study.</p>
                     </article>
 
                     <article id="costs" style="display:none">
@@ -80,8 +82,9 @@
                     </article>
 
                     <article id="benefits" style="display:none">
-                        <h2>Who has the highest NPV?</h2>
-                        <p>Demographics arranged in order of descending <em>Net Present Value</em>.</p>
+                        <h2>How do costs affect Net Present Value?</h2>
+                        <p>Each pie chart is sized according to the gross benefits an individual receives in a given country based on their gender and level of education. Costs are then displayed as slices of the pie chart, leaving the <em>Net Present Value</em> as the colored section of the chart.</p>
+
                         <table class="legend">
                             <tr>
                                 <td class="direct-cost swatch" />
@@ -104,12 +107,28 @@
                                 <th>Transfers Effect</th>
                             </tr>
                         </table>
+                        <h5>Direct Cost</h5>
+                        <p>The amount of money paid by the individual for the education (tuition fees, &amp;c.).</p>
+
+                        <h5>Foregone Earnings</h5>
+                        <p>An estimate of the amount of money an individual would have earned if they&rsquo;d elected to enter the workforce instead of attending school.</p>
+
+                        <h5>Income Tax Effect</h5>
+                        <p>An estimate of the amount of taxes an individual pays as a result of earning a higher income due to their higher level of education.</p>
+
+                        <h5>Social Contribution Effect</h5>
+                        <p>Additional contributions to social programs (such as social security) as a result of higher income.</p>
+
+                        <h5>Transfers Effect</h5>
+                        <p>An estimate of foregone financial transfers from government programs (<i>e.g.</i> housing subsidies) as a result of earning a higher income.</p>
                     </article>
                 </div>
 
                 <div class="span9">
-                    <select name="filter" class="filter country chzn-select span3"
-                    multiple data-placeholder="Show countries...">
+                    <select id="country-filter" name="filter"
+                        class="filter country chzn-select"
+                        style="width:390px"
+                        multiple data-placeholder="Show countries...">
                         <option>Australia</option>
                         <option>Austria</option>
                         <option>Belgium</option>
@@ -147,6 +166,7 @@
                         <option>OECD average</option>
                         <option>EU21 average</option>
                     </select>
+                    <button id="clear" disabled>Clear</button>
                     <svg class="npv">
                         <g class="content">
                             <g class="x axis"></g>

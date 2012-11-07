@@ -95,6 +95,21 @@ svg {
     display: none;
 }
 
+.bars {
+    margin-top: 5px;
+}
+
+.bar {
+    height: 14px;
+    margin: 2px 0;
+    text-align: right;
+}
+
+.bar .fill {
+    float: left;
+    height: 14px;
+}
+
 .tooltip {
     background-color: #FFF;
     background-color: rgba(255, 255, 255, 0.95);
@@ -110,6 +125,7 @@ svg {
 }
 
 .tooltip .flag {
+    border: 1px solid #333;
     float: left;
     margin-right: 1em;
     width: 100px;
@@ -162,21 +178,25 @@ svg {
 
 .costs .male.post-secondary .income-tax-effect,
 .male.post-secondary .net-present-value {
+    background-color: #53A5B6;    
     fill: #53A5B6;
 }
 
 .costs .male.tertiary .income-tax-effect,
 .male.tertiary .net-present-value {
+    background-color: #0A527E;
     fill: #0A527E;
 }
 
 .costs .female.post-secondary .income-tax-effect,
 .female.post-secondary .net-present-value {
+    background-color: #E7BDC6;
     fill: #E7BDC6;
 }
 
 .costs .female.tertiary .income-tax-effect,
 .female.tertiary .net-present-value {
+    background-color: #CB7C97;
     fill: #CB7C97;
 }
 
