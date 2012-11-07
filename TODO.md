@@ -4,7 +4,6 @@
 - SVG is too narrow in Firefox
 
 ## Charts
-- Clear button for filters
 - Callouts for significant data points
 	- Highest/lowest
 	- Average
