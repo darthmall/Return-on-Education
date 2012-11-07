@@ -36,14 +36,14 @@ eag.multiples = function () {
       g.selectAll('text.title, text.label').remove();
 
       selection.sort(function (a, b) {
-        return b.value['private']['net present value'] - a.value['private']['net present value'];
+        return b['net present value'] - a['net present value'];
       });
 
       var path = selection.selectAll('path')
           .data(function (d) {
             var key = d.key,
               r = d.radius,
-              entries = d3.entries(d.value['private'])
+              entries = d3.entries(d)
                 .filter(function (d) {
                   return (_fields.indexOf(d.key) >= 0) && !isNaN(d.value);
                 });
@@ -67,8 +67,8 @@ eag.multiples = function () {
 
       var label = selection.selectAll('.label')
           .data(function (d) {
-            return [{'country': d.value['private'].country,
-              'npv': d.value['private']['net present value']}];
+            return [{'country': d.country,
+              'npv': d['net present value']}];
           });
 
       var labelEnter = label.enter().append('g')
@@ -161,9 +161,9 @@ eag.multiples = function () {
     // Private methods
     function isValid(d) {
       return !d3.select(this).classed('hidden') &&
-          !isNaN(d.value['private']['net present value']) &&
-          d.value['private']['net present value'] > 0 &&
-          !isNaN(d.value['private']['total benefits']);
+          !isNaN(d['net present value']) &&
+          d['net present value'] > 0 &&
+          !isNaN(d['total benefits']);
     }
 
     function isInvalid(d) {
@@ -172,7 +172,7 @@ eag.multiples = function () {
 
     function onMouseover(d) {
       var translate = $(this).offset(),
-        country = d.value['private'].country,
+        country = d.country,
         id = d.key.replace(/\s+/g, '_'),
         $tip = $('<div class="tooltip benefits"><h3></h3><img class="flag" /></div>')
             .attr('id', id).appendTo('body'),
@@ -183,19 +183,19 @@ eag.multiples = function () {
         $tip.children('.flag')
             .attr('src', 'img/flags/' + country.toLowerCase() + '.png');
 
-        $table.find('.total-benefits').text(eag.dollars((d.value['private']['gross earnings benefits'] || 0) +
-          (d.value['private']['unemployment effect'] || 0) +
-          (d.value['private']['grants effect'] || 0)));
+        $table.find('.total-benefits').text(eag.dollars((d['gross earnings benefits'] || 0) +
+          (d['unemployment effect'] || 0) +
+          (d['grants effect'] || 0)));
 
         _fields.forEach(function (field) {
-          var v = d.value['private'][field];
+          var v = d[field];
           if (field !== 'net present value' && !isNaN(v) && v !== 0) {
             $('<tr><th>' + field + '</th><td>' + eag.dollars(v) + '</td></tr>')
                 .appendTo($table);
           }
         });
         
-        $('<tr><th>Net Present Value</th><td>' + eag.dollars(d.value['private']['net present value']) + '</td></tr>')
+        $('<tr><th>Net Present Value</th><td>' + eag.dollars(d['net present value']) + '</td></tr>')
             .appendTo($table);
 
         $tip.css({
